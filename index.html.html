@@ -1,0 +1,1287 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>منصة إدارة الهاكاثونات</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: race-lane admin shell — ink sidebar with lane stripes, calm workspace, active hackathon pinned in the top bar */
+:root{
+  --bg:#F2F4F3; --surface:#FFFFFF; --surface-2:#E9EEEC; --line:#D3DCD8; --fg:#15201D; --muted:#56655F;
+  --ink:#0D2724; --ink-2:#143531; --ink-fg:#DDEAE6; --ink-muted:#8EA9A2; --ink-line:#24453F;
+  --accent:#0A7468; --accent-fg:#FFFFFF; --accent-soft:#D3ECE7; --signal:#C97A1F;
+  --ok:#1C6E3F; --ok-bg:#DCF1E4; --warn:#8A5A00; --warn-bg:#FAEDCF; --bad:#A92E26; --bad-bg:#F8DFDB;
+  --info:#285A9E; --info-bg:#DEE8F7; --neutral:#55625D; --neutral-bg:#E4EAE7; --purple:#623FA0; --purple-bg:#EBE3F6;
+  --shadow:0 1px 2px rgba(13,39,36,.06),0 4px 16px rgba(13,39,36,.06);
+  --f-display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,"SFMono-Regular",monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1715; --surface:#16211E; --surface-2:#1D2A27; --line:#2B3B37; --fg:#E3ECE9; --muted:#9AAEA8;
+  --ink:#0A1412; --ink-2:#10201D; --ink-fg:#D6E5E0; --ink-muted:#7F9B94; --ink-line:#1F3833;
+  --accent:#3FB5A5; --accent-fg:#06201C; --accent-soft:#183B36; --signal:#E3A04B;
+  --ok:#6FD39A; --ok-bg:#183626; --warn:#F0C062; --warn-bg:#3A2D10; --bad:#F2877E; --bad-bg:#3E1C19;
+  --info:#8DB4EE; --info-bg:#1B2B44; --neutral:#A7B5B0; --neutral-bg:#253230; --purple:#B9A0EA; --purple-bg:#2C2342;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1715; --surface:#16211E; --surface-2:#1D2A27; --line:#2B3B37; --fg:#E3ECE9; --muted:#9AAEA8;
+  --ink:#0A1412; --ink-2:#10201D; --ink-fg:#D6E5E0; --ink-muted:#7F9B94; --ink-line:#1F3833;
+  --accent:#3FB5A5; --accent-fg:#06201C; --accent-soft:#183B36; --signal:#E3A04B;
+  --ok:#6FD39A; --ok-bg:#183626; --warn:#F0C062; --warn-bg:#3A2D10; --bad:#F2877E; --bad-bg:#3E1C19;
+  --info:#8DB4EE; --info-bg:#1B2B44; --neutral:#A7B5B0; --neutral-bg:#253230; --purple:#B9A0EA; --purple-bg:#2C2342;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ink)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;font-weight:600}
+h1{font-size:1.55rem} h2{font-size:1.12rem} h3{font-size:.98rem}
+.num,.mono{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--ink);color:var(--ink-fg);display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--ink-line)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:600;white-space:nowrap}
+.brand .mark{width:30px;height:30px;border-radius:7px;background:repeating-linear-gradient(90deg,var(--signal) 0 4px,transparent 4px 9px),var(--ink-2);border:1px solid var(--ink-line)}
+.hk-pick{display:flex;align-items:center;gap:8px;background:var(--ink-2);border:1px solid var(--ink-line);border-radius:10px;padding:4px 6px 4px 10px;min-width:0}
+.hk-pick .lane{width:6px;align-self:stretch;border-radius:3px}
+.hk-pick label{font-size:.72rem;color:var(--ink-muted);letter-spacing:.02em}
+.hk-pick select{background:transparent;border:0;color:var(--ink-fg);font-weight:600;max-width:320px;padding:2px}
+.hk-pick select option{color:#15201D;background:#fff}
+.top .grow{flex:1}
+.top .search{display:flex;align-items:center;background:var(--ink-2);border:1px solid var(--ink-line);border-radius:9px;padding:0 10px;min-width:0}
+.top .search input{background:transparent;border:0;color:var(--ink-fg);padding:7px 4px;width:200px;max-width:40vw}
+.top .search input::placeholder{color:var(--ink-muted)}
+.tbtn{background:var(--ink-2);border:1px solid var(--ink-line);color:var(--ink-fg);border-radius:9px;padding:6px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;position:relative}
+.tbtn .dot{position:absolute;top:-5px;inset-inline-end:-5px;background:var(--signal);color:#1a1205;border-radius:99px;font-size:.68rem;min-width:18px;height:18px;display:grid;place-items:center;font-family:var(--f-data)}
+.proto{font-size:.72rem;border:1px dashed var(--signal);color:var(--signal);border-radius:99px;padding:2px 9px;white-space:nowrap}
+details.pop{position:relative}
+details.pop>summary{list-style:none}
+details.pop>summary::-webkit-details-marker{display:none}
+.pop-body{position:absolute;inset-inline-end:0;top:calc(100% + 6px);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);width:min(330px,88vw);padding:8px;z-index:50}
+.pop-body button.row{display:flex;justify-content:space-between;width:100%;background:none;border:0;padding:8px;border-radius:8px;cursor:pointer;text-align:start;gap:8px}
+.pop-body button.row:hover{background:var(--surface-2)}
+.pop-body .cap{font-size:.75rem;color:var(--muted);padding:6px 8px}
+
+/* shell */
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:calc(100% - 56px)}
+.side{background:var(--ink);color:var(--ink-fg);padding:14px 10px 40px;border-inline-end:1px solid var(--ink-line)}
+.side .grp{font-size:.72rem;letter-spacing:.04em;color:var(--ink-muted);padding:14px 10px 6px;display:flex;justify-content:space-between;gap:6px}
+.side .grp b{font-weight:600;color:var(--signal);font-family:var(--f-display);font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side button.nav{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;color:var(--ink-fg);padding:8px 10px;border-radius:8px;cursor:pointer;text-align:start;font-size:.9rem}
+.side button.nav svg{width:17px;height:17px;flex:none;opacity:.8}
+.side button.nav:hover{background:var(--ink-2)}
+.side button.nav.on{background:var(--ink-2);box-shadow:inset -3px 0 0 var(--signal)}
+[dir="ltr"] .side button.nav.on{box-shadow:inset 3px 0 0 var(--signal)}
+.side button.nav .cnt{margin-inline-start:auto;font-family:var(--f-data);font-size:.72rem;background:var(--accent);color:var(--accent-fg);border-radius:99px;padding:0 7px}
+.side button.nav .later{margin-inline-start:auto;font-size:.66rem;color:var(--ink-muted);border:1px solid var(--ink-line);border-radius:99px;padding:0 6px}
+.side button.nav.muted{color:var(--ink-muted)}
+main{padding-block:22px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-width:0}
+.wrap{max-width:1320px;margin:0 auto;display:grid;gap:18px}
+.navtoggle{display:none}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .side{display:none}
+  .side.open{display:block}
+  .navtoggle{display:inline-flex}
+  .top .search input{width:120px}
+}
+
+/* page head */
+.crumb{font-size:.78rem;color:var(--muted)}
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ph .sub{color:var(--muted);margin-top:2px;max-width:70ch}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:9px;padding:7px 13px;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.pri{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn.pri:hover{filter:brightness(1.07)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.sm{padding:4px 9px;font-size:.82rem;border-radius:7px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.lnk{background:none;border:0;color:var(--accent);cursor:pointer;padding:0;font-weight:500;text-align:start}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.card>.hd{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.card>.bd{padding:16px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:1000px){.g2,.g3{grid-template-columns:1fr}}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:2px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;inset-block:10px;inset-inline-start:0;width:4px;border-radius:0 4px 4px 0;background:var(--k,var(--line))}
+.kpi .l{font-size:.8rem;color:var(--muted)}
+.kpi .v{font-family:var(--f-data);font-size:1.7rem;font-weight:600;line-height:1.2;display:flex;align-items:baseline;gap:6px}
+.kpi .v small{font-family:var(--f-body);font-size:.78rem;color:var(--muted);font-weight:500}
+.kpi .s{font-size:.76rem;color:var(--muted)}
+button.kpi{text-align:start;cursor:pointer;font:inherit;color:inherit}
+button.kpi:hover{border-color:var(--accent)}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:1px 9px;font-size:.78rem;font-weight:500;white-space:nowrap;background:var(--neutral-bg);color:var(--neutral)}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.info{background:var(--info-bg);color:var(--info)}
+.pill.purple{background:var(--purple-bg);color:var(--purple)}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:.75rem;color:var(--muted)}
+.trk{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.trk i{width:9px;height:9px;border-radius:3px;display:inline-block}
+
+/* table */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
+.toolbar input[type=search]{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 10px;width:220px;max-width:100%}
+.toolbar select,.field select,.field input,.field textarea{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 9px;max-width:100%}
+.toolbar .sp{flex:1}
+.bulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;background:var(--accent-soft);border-bottom:1px solid var(--line)}
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:.87rem}
+.tbl th{text-align:start;font-weight:600;font-size:.8rem;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface-2)}
+.tbl th button{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;display:inline-flex;gap:4px}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr.click{cursor:pointer}
+.tbl tr.click:hover td{background:var(--surface-2)}
+.tbl td.n{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.pager .pg{display:flex;gap:4px}
+.pager .pg button{min-width:30px;border:1px solid var(--line);background:var(--surface);border-radius:7px;cursor:pointer;padding:3px 7px;font-family:var(--f-data)}
+.pager .pg button.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+details.cols{position:relative}
+details.cols summary{list-style:none;cursor:pointer}
+details.cols .menu{position:absolute;inset-inline-end:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;z-index:20;box-shadow:var(--shadow);display:grid;gap:4px;min-width:200px}
+
+/* empty / state */
+.empty{padding:34px 16px;text-align:center;color:var(--muted);display:grid;gap:8px;justify-items:center}
+.empty b{color:var(--fg);font-family:var(--f-display)}
+.note{border:1px solid var(--line);border-inline-start:4px solid var(--info);background:var(--surface);border-radius:10px;padding:10px 14px;font-size:.86rem}
+.note.warn{border-inline-start-color:var(--signal)} .note.bad{border-inline-start-color:var(--bad)} .note.ok{border-inline-start-color:var(--ok)}
+.denied{display:grid;place-items:center;padding:60px 16px;text-align:center;gap:10px}
+.denied .code{font-family:var(--f-data);font-size:2.4rem;color:var(--bad)}
+
+/* forms */
+.form{display:grid;gap:14px}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+@media (max-width:700px){.fgrid{grid-template-columns:1fr}}
+.field{display:grid;gap:4px;min-width:0}
+.field>span{font-size:.8rem;font-weight:500;color:var(--muted)}
+.field>span em{color:var(--bad);font-style:normal}
+.field input,.field select,.field textarea{width:100%;padding:8px 10px}
+.field textarea{min-height:76px;resize:vertical}
+.field small{color:var(--muted);font-size:.75rem}
+.field.full{grid-column:1/-1}
+.chk{display:flex;gap:8px;align-items:center}
+fieldset{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0;display:grid;gap:12px}
+legend{font-family:var(--f-display);font-weight:600;padding:0 6px}
+.err{color:var(--bad);font-size:.82rem}
+.sum{font-family:var(--f-data);font-weight:600}
+.sum.bad{color:var(--bad)} .sum.ok{color:var(--ok)}
+
+/* drawer & modal */
+.scrim{position:fixed;inset:0;background:rgba(8,20,18,.45);z-index:70}
+.drawer{position:fixed;top:0;bottom:0;inset-inline-end:0;width:min(640px,100%);background:var(--bg);z-index:71;display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(0,0,0,.18);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer .dh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:16px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.drawer .db{overflow:auto;padding:16px 18px;display:grid;gap:14px;align-content:start;flex:1}
+.drawer .df{padding:12px 18px;border-top:1px solid var(--line);background:var(--surface);display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.modal{position:fixed;inset:0;display:grid;place-items:center;z-index:80;padding:16px}
+.modal .box{background:var(--surface);border-radius:14px;width:min(520px,100%);max-height:86vh;overflow:auto;box-shadow:var(--shadow);border:1px solid var(--line)}
+.modal .box .bd{padding:18px;display:grid;gap:12px}
+.modal .box .ft{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.toasts{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));inset-inline-start:16px;z-index:90;display:grid;gap:8px}
+.toast{background:var(--fg);color:var(--bg);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow);max-width:380px;font-size:.88rem}
+.toast.bad{background:var(--bad);color:#fff}
+
+/* misc */
+.kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 12px;font-size:.88rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.tl{display:grid;gap:8px;border-inline-start:2px solid var(--line);padding-inline-start:12px}
+.tl div{font-size:.84rem} .tl small{color:var(--muted)}
+.stack{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--surface-2)}
+.stack span{display:block;height:100%}
+.bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--accent);border-radius:99px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-inline-end:5px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs button{background:none;border:0;padding:9px 14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;font-weight:500}
+.tabs button.on{color:var(--fg);border-bottom-color:var(--signal)}
+.list{display:grid}
+.list>div,.list>button{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);background:none;border-inline:0;border-top:0;text-align:start;cursor:default;width:100%}
+.list>button{cursor:pointer}
+.list>*:last-child{border-bottom:0}
+.chip{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:99px;padding:2px 4px 2px 10px;font-size:.82rem;background:var(--surface)}
+.chip.lead{border-color:var(--signal)}
+.chip button{background:none;border:0;cursor:pointer;color:var(--muted);padding:0 4px}
+.steps{display:flex;gap:0;flex-wrap:wrap}
+.steps div{flex:1;min-width:140px;padding:10px 12px;border:1px solid var(--line);background:var(--surface);display:grid;gap:2px;font-size:.84rem}
+.steps div:first-child{border-start-start-radius:10px;border-end-start-radius:10px}
+.steps div:last-child{border-start-end-radius:10px;border-end-end-radius:10px}
+.steps div b{font-family:var(--f-display)}
+.steps div.done{background:var(--ok-bg)} .steps div.cur{background:var(--warn-bg)}
+.hcard{display:grid;gap:10px;padding:16px;position:relative;overflow:hidden}
+.hcard .lane{position:absolute;inset-block:0;inset-inline-start:0;width:6px}
+.matrix td,.matrix th{text-align:center}
+.matrix td:first-child,.matrix th:first-child{text-align:start}
+.prose{max-width:78ch;display:grid;gap:10px}
+.prose ul{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.prose h2{margin-top:10px}
+.score-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.scale{display:flex;gap:4px;flex-wrap:wrap}
+.scale label{position:relative}
+.scale input{position:absolute;opacity:0}
+.scale span{display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--line);border-radius:7px;font-family:var(--f-data);cursor:pointer;background:var(--surface)}
+.scale input:checked+span{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.scale input:focus-visible+span{outline:2px solid var(--signal)}
+.scale input:disabled+span{cursor:default;opacity:.7}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:no-preference){.drawer{animation:slide .18s ease-out}.toast{animation:pop .2s ease-out}}
+@keyframes slide{from{transform:translateX(-24px);opacity:.6}}
+@keyframes pop{from{transform:translateY(8px);opacity:0}}
+</style>
+
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+   منصة إدارة الهاكاثونات — نموذج أولي (بيانات محلية تجريبية)
+   الطبقة "api" تحاكي الخادم: كل تعديل يمر بفحص الصلاحية والنطاق.
+   ========================================================= */
+const API_URL='https://hackathon-admin-api.innovationraces.workers.dev/api';
+const TOKEN_KEY='hk-admin-token';
+let DB=null;
+const UI={user:null,token:null,authView:'login',busy:false,hid:null,page:'dash',lang:'ar',tables:{},sel:{},drawer:null,modal:null,toasts:[],nav:false,tab:{},q:'',focus:null,journey:null};
+
+/* ---------- utilities ---------- */
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let _n=0; const uid=p=>p+Date.now().toString(36).slice(-4)+(++_n).toString(36)+Math.random().toString(36).slice(2,5);
+const now=()=>new Date().toISOString();
+const pad=n=>String(n).padStart(2,'0');
+function fmtD(s){if(!s)return '—';const d=new Date(s);if(isNaN(d))return '—';return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function fmtDT(s){if(!s)return '—';const d=new Date(s);if(isNaN(d))return '—';return `${fmtD(s)} ${pad(d.getHours())}:${pad(d.getMinutes())}`}
+const sum=a=>a.reduce((x,y)=>x+(+y||0),0);
+const avg=a=>a.length?sum(a)/a.length:null;
+const r1=n=>n==null?'—':(Math.round(n*100)/100).toFixed(2);
+
+/* ---------- vocab ---------- */
+const ROLES={admin:'مدير النظام',hmanager:'مدير الهاكاثون',registrar:'مسؤول التسجيل والفرز',judging:'مسؤول التحكيم',content:'مسؤول المحتوى',judge:'محكم',viewer:'اطلاع وتقارير'};
+const RES={hackathon:'الهاكاثونات وإعداداتها',track:'المسارات والتحديات',criteria:'معايير التحكيم',application:'طلبات التسجيل',team:'الفرق',project:'المشاريع والتسليمات',judging:'المحكمون والجلسات',evaluation:'التقييمات',results:'النتائج',users:'المستخدمون والصلاحيات',audit:'سجل الأنشطة'};
+const ACTS={v:'مشاهدة',c:'إضافة',e:'تعديل',d:'حذف',a:'اعتماد',p:'نشر',x:'تصدير'};
+const MATRIX={
+  admin:{hackathon:'vcedapx',track:'vcedx',criteria:'vcedx',application:'vcedax',team:'vcedx',project:'vcedax',judging:'vcedax',evaluation:'vax',results:'vcapx',users:'vced',audit:'vx'},
+  hmanager:{hackathon:'veapx',track:'vcedx',criteria:'vcedx',application:'vceax',team:'vcedx',project:'vceax',judging:'vcedax',evaluation:'vax',results:'vcapx',users:'v',audit:'v'},
+  registrar:{hackathon:'v',track:'v',criteria:'v',application:'vceax',team:'vcex',project:'v'},
+  judging:{hackathon:'v',track:'v',criteria:'vcex',team:'v',project:'veax',judging:'vcedax',evaluation:'vax',results:'vcx'},
+  content:{hackathon:'vep',track:'vce',criteria:'v'},
+  judge:{evaluation:'vce'},
+  viewer:{hackathon:'v',track:'v',criteria:'v',application:'vx',team:'vx',project:'vx',judging:'v',results:'vx'}
+};
+const ELIG={unreviewed:['لم تُراجع','neutral'],eligible:['مؤهل','ok'],ineligible:['غير مؤهل','bad'],needs_info:['يحتاج استكمالًا','warn']};
+const ELIG_T={unreviewed:['eligible','ineligible','needs_info'],needs_info:['eligible','ineligible'],eligible:['unreviewed'],ineligible:['unreviewed']};
+const DEC={pending:['قيد المراجعة','info'],accepted:['مقبول','ok'],waitlist:['قائمة انتظار','warn'],rejected:['مرفوض','bad'],withdrawn:['منسحب','neutral']};
+const DEC_T={pending:['accepted','waitlist','rejected'],waitlist:['accepted','rejected'],accepted:['withdrawn'],rejected:['pending'],withdrawn:['pending']};
+const DEC_VERB={accepted:'قبول',waitlist:'نقل لقائمة الانتظار',rejected:'رفض',withdrawn:'تسجيل انسحاب',pending:'إعادة للمراجعة'};
+const ELIG_VERB={eligible:'مؤهل',ineligible:'غير مؤهل',needs_info:'طلب استكمال',unreviewed:'إعادة فتح الأهلية'};
+const PROJ={draft:['مسودة','neutral'],submitted:['مقدَّمة','info'],under_review:['قيد المراجعة','info'],needs_changes:['تحتاج تعديلًا','warn'],resubmitted:['أعيد تقديمها','info'],eligible:['مؤهلة للتحكيم','purple'],evaluated:['مقيّمة','ok'],final:['قرار نهائي','ok']};
+const PROJ_T={draft:['submitted'],submitted:['under_review'],under_review:['needs_changes','eligible'],needs_changes:['resubmitted'],resubmitted:['under_review'],eligible:['evaluated'],evaluated:['final'],final:[]};
+const FOLLOW={none:['لا متابعة','neutral'],candidate:['مرشح للتبني','info'],adopted:['تقرر تبنيه','ok'],in_dev:['قيد التطوير','purple'],delivered:['سُلّم المخرج','ok'],closed:['أُغلق','neutral']};
+const HST={draft:['مسودة','neutral'],published:['منشور','ok'],archived:['مؤرشف','warn']};
+const RST={none:['لم تُحتسب','neutral'],calculated:['محتسبة — بانتظار الاعتماد','warn'],approved:['معتمدة — غير منشورة','info'],published:['منشورة','ok']};
+const MODE={onsite:'حضوري',virtual:'افتراضي',hybrid:'هجين'};
+const TIE={criteria:'حسب ترتيب المعايير ثم قرار يدوي',shared:'مشاركة المركز',manual:'قرار يدوي موثّق'};
+const INC={block:'منع الاعتماد حتى تكتمل التقييمات',partial:'الاحتساب بالمتاح مع تمييز النتيجة'};
+const pill=(map,k)=>{const m=map[k]||[k,'neutral'];return `<span class="pill ${m[1]}">${esc(m[0])}</span>`};
+
+/* ---------- i18n (واجهة فقط) ---------- */
+const EN={'لوحة التحكم العامة':'Company dashboard','الهاكاثونات':'Hackathons','المستخدمون والصلاحيات':'Users & roles','سجل الأنشطة':'Activity log','فهم المنصة والخطة':'Analysis & plan','نظرة عامة':'Overview','الإعدادات':'Settings','المسارات والتحديات':'Tracks & challenges','معايير التحكيم':'Judging criteria','المشاركون والطلبات':'Applicants','الفرق':'Teams','المشاريع والتسليمات':'Projects & submissions','المحكمون والجلسات':'Judges & sessions','النتائج والاعتماد':'Results','متابعة الحلول':'Solution follow-up','الأجندة':'Agenda','الجهات والشركاء':'Partners','الأسئلة الشائعة':'FAQ','الإرشاد':'Mentoring','الشهادات':'Certificates','الملفات والتقارير':'Files & reports','تقييماتي':'My reviews','الشركة':'Company','الإعداد':'Setup','الفرز والقبول':'Screening','الفرق والمشاريع':'Teams & projects','التحكيم والنتائج':'Judging & results','ما بعد الفعالية':'After the event','لاحقًا':'Later','الهاكاثون النشط':'Active hackathon','بحث في الهاكاثون…':'Search this hackathon…','الإشعارات':'Notifications','الدخول كـ':'Sign in as','نموذج أولي — بيانات محلية تجريبية':'Prototype — local sample data'};
+const t=s=>UI.lang==='en'?(EN[s]||s):s;
+
+/* ---------- remote data ---------- */
+function commit(){}
+function getToken(){try{return localStorage.getItem(TOKEN_KEY)}catch(e){return UI.token}}
+function setToken(t){UI.token=t;try{t?localStorage.setItem(TOKEN_KEY,t):localStorage.removeItem(TOKEN_KEY)}catch(e){}}
+function setBusy(on){UI.busy=on;const el=document.getElementById('busy');if(el)el.hidden=!on}
+async function call(action,args=[]){setBusy(true);
+  try{let r;try{r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json',...(UI.token?{Authorization:'Bearer '+UI.token}:{})},body:JSON.stringify({action,args})})}
+    catch(e){throw new Error('تعذر الاتصال بالخادم. تحقق من الإنترنت ثم حاول مجددًا.')}
+    let j={};try{j=await r.json()}catch(e){throw new Error('تعذر قراءة رد الخادم.')}
+    if(r.status===401&&j.auth===false){setToken(null);DB=null;UI.user=null;render();throw new Error(j.error)}
+    if(!r.ok||j.error)throw (j.denied?new Denied(j.error):new Error(j.error||'تعذر تنفيذ الطلب.'));
+    if(j.data){DB=j.data;UI.user=j.me}
+    return j.result!==undefined&&j.result!==null?j.result:j}
+  finally{setBusy(false)}}
+const api=new Proxy({},{get:(_,name)=>(...args)=>call(name,args)});
+async function loadData(){await call('load');render()}
+/* ---------- selectors ---------- */
+const H=id=>DB.hackathons.find(h=>h.id===id);
+const T=id=>DB.tracks.find(x=>x.id===id);
+const A=id=>DB.apps.find(x=>x.id===id);
+const TM=id=>DB.teams.find(x=>x.id===id);
+const PR=id=>DB.projects.find(x=>x.id===id);
+const U=id=>DB.users.find(x=>x.id===id);
+const uname=id=>id==='system'?'النظام':(U(id)?.name||'—');
+const tracksOf=hid=>DB.tracks.filter(x=>x.hid===hid).sort((a,b)=>a.order-b.order);
+const appsOf=hid=>DB.apps.filter(x=>x.hid===hid);
+const teamsOf=hid=>DB.teams.filter(x=>x.hid===hid);
+const projectsOf=hid=>DB.projects.filter(x=>x.hid===hid);
+const membersOf=tid=>DB.apps.filter(a=>a.teamId===tid);
+const projOfTeam=tid=>DB.projects.find(p=>p.teamId===tid);
+const trackTag=id=>{const x=T(id);return x?`<span class="trk"><i style="background:${esc(x.color)}"></i>${esc(x.nameAr)}</span>`:'<span class="muted">—</span>'};
+/* effective criteria for a track: hackathon criteria (enabled) with optional track weights */
+function critOf(trackId){const tr=T(trackId);const h=H(tr.hid);return h.criteria.filter(c=>c.enabled).map(c=>({...c,weight:tr.weights&&tr.weights[c.code]!=null?+tr.weights[c.code]:+c.weight}))}
+function requiredJudges(p){return DB.judgeTracks.filter(j=>j.hid===p.hid&&j.trackId===p.trackId).map(j=>j.judgeId)
+  .filter(j=>!DB.coi.some(c=>c.projectId===p.id&&c.judgeId===j&&c.status==='approved'))}
+function teamCheck(tm){const h=H(tm.hid);const m=membersOf(tm.id);const miss=[];
+  if(m.length<h.teamMin)miss.push(`ينقصه ${h.teamMin-m.length} عضو للحد الأدنى (${h.teamMin})`);
+  if(m.length>h.teamMax)miss.push(`تجاوز الحد الأقصى (${h.teamMax})`);
+  if(!tm.leaderId)miss.push('لم يُحدَّد قائد');
+  if(!tm.trackId)miss.push('لم يُربط بمسار');
+  if(!tm.challengeId)miss.push('لم يُربط بتحدٍ');
+  if(!projOfTeam(tm.id))miss.push('لا يوجد مشروع');
+  return {count:m.length,miss,ok:miss.length===0}}
+
+/* ---------- permissions (تحاكي الفحص على الخادم) ---------- */
+class Denied extends Error{}
+const me=()=>U(UI.user);
+const inScope=(u,hid)=>u.scope==='all'||(u.scope||[]).includes(hid);
+function can(res,act,hid,u=me()){if(!u||!u.active)return false;const l=(MATRIX[u.role]||{})[res]||'';if(!l.includes(act))return false;if(hid&&!inScope(u,hid))return false;return true}
+function guard(res,act,hid){if(!can(res,act,hid))throw new Denied(`لا تملك صلاحية «${ACTS[act]}» على «${RES[res]}»${hid?' في هذا الهاكاثون':''}.`)}
+function guardScope(hid){const u=me();if(!u||!H(hid)||!inScope(u,hid))throw new Denied('هذا الهاكاثون خارج نطاق حسابك. لا يمكن عرض بياناته أو تعديلها.')}
+const fail=m=>{throw new Error(m)};
+function log(hid,action,detail){DB.audit.unshift({id:uid('l'),at:now(),userId:UI.user,hid:hid||null,action,detail:detail||''})}
+function markStale(hid,why){const r=H(hid).results;if(r.state==='none')return;r.stale=true;if(r.state==='approved'){r.state='calculated';log(hid,'سحب اعتماد النتائج تلقائيًا',why)}}
+function judgeCanSee(p,uid_){return requiredJudges(p).includes(uid_)&&['eligible','evaluated','final'].includes(p.status)}
+
+/* ---------- validation helpers ---------- */
+function validateH(d){const e=[];
+  if(!d.nameAr?.trim())e.push('الاسم بالعربية مطلوب.');
+  if(!d.eventStart||!d.eventEnd)e.push('حدد تاريخ بداية ونهاية الفعالية.');
+  if(d.eventStart&&d.eventEnd&&d.eventStart>d.eventEnd)e.push('تاريخ نهاية الفعالية يسبق بدايتها.');
+  if(d.regStart&&d.regEnd&&d.regStart>d.regEnd)e.push('نهاية التسجيل تسبق بدايته.');
+  if(d.regEnd&&d.eventStart&&d.regEnd>d.eventStart)e.push('يجب أن ينتهي التسجيل قبل بداية الفعالية.');
+  if(+d.teamMin<1||+d.teamMax<+d.teamMin)e.push('الحد الأدنى لحجم الفريق يجب أن يكون 1 أو أكثر ولا يتجاوز الحد الأقصى.');
+  if(+d.scoreMin<0||+d.scoreMax<=+d.scoreMin)e.push('مقياس الدرجات غير صحيح: الحد الأقصى يجب أن يزيد على الحد الأدنى.');
+  if(!d.allowIndividual&&!d.allowTeam)e.push('اسمح بنوع تسجيل واحد على الأقل (فردي أو فريق).');
+  if(e.length)fail(e.join(' '))}
+const hasEvals=hid=>DB.evals.some(e=>e.hid===hid&&e.status==='submitted');
+
+/* =========================================================
+   API — كل عملية تعديل تمر من هنا
+   ========================================================= */
+const localApi={
+  viewHackathon(hid){guardScope(hid);return H(hid)},
+  createHackathon(d){guard('hackathon','c');
+    const base={edition:'',tz:'Asia/Riyadh',teamMin:3,teamMax:5,maxTeams:15,allowIndividual:true,allowTeam:true,scoreMin:1,scoreMax:10,tieRule:'criteria',tieOrder:[],incompletePolicy:'block',maxFileKB:20480,extensions:'pdf, pptx',criteria:[],...d};
+    validateH(base);const h={...base,id:uid('h'),status:'draft',results:{state:'none',rows:[],overrides:{},stale:false},createdAt:now(),v:1};
+    DB.hackathons.push(h);log(h.id,'إنشاء هاكاثون',h.nameAr);commit();return h},
+  updateHackathon(id,d){guard('hackathon','e',id);const h=H(id);if(h.status==='archived')fail('الهاكاثون مؤرشف. أعد تفعيله قبل التعديل.');
+    if(d.scoreMin!=null&&(+d.scoreMin!==+h.scoreMin||+d.scoreMax!==+h.scoreMax)&&hasEvals(id))fail('لا يمكن تغيير مقياس الدرجات بعد تسليم تقييمات نهائية.');
+    validateH({...h,...d});Object.assign(h,d);h.v++;log(id,'تعديل إعدادات الهاكاثون',Object.keys(d).length+' حقلًا');commit()},
+  setHStatus(id,s){if(s==='published')guard('hackathon','p',id);else guard('hackathon','e',id);const h=H(id);
+    if(s==='published'&&!tracksOf(id).length)fail('أضف مسارًا واحدًا على الأقل قبل النشر.');
+    const old=h.status;h.status=s;log(id,'تغيير حالة الهاكاثون',`${HST[old][0]} ← ${HST[s][0]}`);commit()},
+  saveCriteria(hid,list){guard('criteria',list.some(c=>c.isNew)?'c':'e',hid);const h=H(hid);
+    if(hasEvals(hid))fail('بدأ تسليم التقييمات النهائية. لا يمكن تعديل المعايير أو أوزانها الآن.');
+    const codes=list.map(c=>c.code.trim());
+    if(list.some(c=>!c.code.trim()||!c.nameAr.trim()))fail('لكل معيار رمز واسم بالعربية.');
+    if(new Set(codes).size!==codes.length)fail('رموز المعايير يجب ألا تتكرر.');
+    if(list.some(c=>!/^[a-z0-9_]+$/.test(c.code.trim())))fail('الرمز بحروف إنجليزية صغيرة وأرقام و _ فقط (مثل technical_impl).');
+    const s=sum(list.filter(c=>c.enabled).map(c=>c.weight));if(s!==100)fail(`مجموع أوزان المعايير المفعّلة ${s}%، ويجب أن يكون 100%.`);
+    h.criteria=list.map(c=>({id:c.id||uid('c'),code:c.code.trim(),nameAr:c.nameAr.trim(),weight:+c.weight,enabled:!!c.enabled}));
+    h.tieOrder=(h.tieOrder||[]).filter(k=>codes.includes(k));log(hid,'تعديل معايير التحكيم',`${list.length} معايير`);commit()},
+  saveTrack(hid,d,challengeLines){guard('track',d.id?'e':'c',hid);
+    if(!d.nameAr?.trim())fail('اسم المسار بالعربية مطلوب.');
+    if(+d.winners<0||+d.winners>10)fail('عدد المراكز الفائزة بين 0 و10.');
+    if(d.weights){const s=sum(Object.values(d.weights));if(s!==100)fail(`مجموع الأوزان الخاصة بالمسار ${s}%، ويجب أن يكون 100%.`);
+      if(hasEvals(hid)){const old=d.id?T(d.id).weights:null;if(JSON.stringify(old)!==JSON.stringify(d.weights))fail('لا يمكن تعديل أوزان المسار بعد تسليم تقييمات نهائية.')}}
+    let tr;if(d.id){tr=T(d.id);Object.assign(tr,d)}else{tr={...d,id:uid('t'),hid,order:tracksOf(hid).length+1};DB.tracks.push(tr)}
+    const titles=challengeLines.map(s=>s.trim()).filter(Boolean);const cur=DB.challenges.filter(c=>c.trackId===tr.id);
+    cur.filter(c=>!titles.includes(c.title)).forEach(c=>{if(DB.teams.some(t=>t.challengeId===c.id))fail(`لا يمكن حذف التحدي «${c.title}» لأنه مرتبط بفريق.`)});
+    DB.challenges=DB.challenges.filter(c=>c.trackId!==tr.id||titles.includes(c.title));
+    titles.forEach(ti=>{if(!cur.some(c=>c.title===ti))DB.challenges.push({id:uid('ch'),hid,trackId:tr.id,title:ti})});
+    log(hid,d.id?'تعديل مسار':'إضافة مسار',tr.nameAr);commit();return tr},
+  deleteTrack(id){const tr=T(id);guard('track','d',tr.hid);
+    if(DB.teams.some(t=>t.trackId===id)||DB.projects.some(p=>p.trackId===id))fail('المسار مرتبط بفرق أو مشاريع. انقلها لمسار آخر أولًا.');
+    DB.tracks=DB.tracks.filter(x=>x.id!==id);DB.challenges=DB.challenges.filter(c=>c.trackId!==id);DB.judgeTracks=DB.judgeTracks.filter(j=>j.trackId!==id);
+    DB.apps.forEach(a=>{if(a.trackId===id)a.trackId=null});log(tr.hid,'حذف مسار',tr.nameAr);commit()},
+  moveTrack(id,dir){const tr=T(id);guard('track','e',tr.hid);const list=tracksOf(tr.hid);const i=list.indexOf(tr),j=i+dir;if(j<0||j>=list.length)return;
+    [list[i].order,list[j].order]=[list[j].order,list[i].order];commit()},
+  createApp(hid,d){guard('application','c',hid);const h=H(hid);
+    if(!d.name?.trim())fail('اسم المتقدم مطلوب.');if(!/^\S+@\S+\.\S+$/.test(d.email||''))fail('البريد الإلكتروني غير صحيح.');
+    if(appsOf(hid).some(a=>a.email.toLowerCase()===d.email.toLowerCase()))fail('يوجد طلب بالبريد نفسه في هذا الهاكاثون.');
+    if(d.regType==='individual'&&!h.allowIndividual)fail('التسجيل الفردي غير مسموح في هذا الهاكاثون.');
+    if(d.regType==='team'&&!h.allowTeam)fail('التسجيل كفريق غير مسموح في هذا الهاكاثون.');
+    const a={nameEn:'',phone:'',org:'',orgType:'',region:'',age:'',specialty:'',experience:'',teamNameReq:'',answers:{},files:[],...d,id:uid('a'),hid,createdAt:now(),eligibility:'unreviewed',decision:'pending',teamId:null,notes:[],
+      history:[{at:now(),by:UI.user,text:'إدخال الطلب يدويًا من لوحة الإدارة'}],v:1};
+    DB.apps.push(a);log(hid,'إضافة طلب تسجيل',a.name);commit();return a},
+  updateApp(id,d,v){const a=A(id);guard('application','e',a.hid);
+    if(String(v)!==String(a.v))fail('عدّل مستخدم آخر هذا الطلب بعد فتحك له. أغلق النافذة وافتح الطلب لتحميل آخر نسخة.');
+    if(d.email&&!/^\S+@\S+\.\S+$/.test(d.email))fail('البريد الإلكتروني غير صحيح.');
+    Object.assign(a,d);a.v++;a.history.push({at:now(),by:UI.user,text:'تعديل بيانات الطلب'});log(a.hid,'تعديل طلب',a.name);commit()},
+  setElig(id,to,reason){const a=A(id);guard('application','e',a.hid);
+    if(!(ELIG_T[a.eligibility]||[]).includes(to))fail(`لا يمكن الانتقال من «${ELIG[a.eligibility][0]}» إلى «${ELIG[to][0]}».`);
+    if(to!=='eligible'&&['accepted','waitlist'].includes(a.decision))fail('الطلب مقبول أو في قائمة الانتظار. غيّر قرار القبول قبل تغيير الأهلية.');
+    if(to!=='eligible'&&!reason?.trim())fail('اكتب سبب القرار أو المطلوب استكماله.');
+    const from=a.eligibility;a.eligibility=to;a.v++;a.history.push({at:now(),by:UI.user,text:`الأهلية: ${ELIG[from][0]} ← ${ELIG[to][0]}`+(reason?` — ${reason}`:'')});
+    log(a.hid,'تغيير أهلية',`${a.name}: ${ELIG[to][0]}`);commit()},
+  setDecision(id,to,reason){const a=A(id);guard('application',['accepted','rejected','waitlist'].includes(to)?'a':'e',a.hid);
+    if(!(DEC_T[a.decision]||[]).includes(to))fail(`لا يمكن الانتقال من «${DEC[a.decision][0]}» إلى «${DEC[to][0]}».`);
+    if(['accepted','waitlist'].includes(to)&&a.eligibility!=='eligible')fail('اعتمد الأهلية «مؤهل» قبل القبول أو قائمة الانتظار.');
+    if(['rejected','withdrawn','pending'].includes(to)&&!reason?.trim())fail('اكتب سبب القرار.');
+    const from=a.decision;let extra='';
+    if(['withdrawn','rejected'].includes(to)&&a.teamId){const tm=TM(a.teamId);if(tm.leaderId===a.id)tm.leaderId=null;extra=` — أُزيل من ${tm.name}`;a.teamId=null}
+    a.decision=to;a.v++;a.history.push({at:now(),by:UI.user,text:`القرار: ${DEC[from][0]} ← ${DEC[to][0]}`+(reason?` — ${reason}`:'')+extra});
+    log(a.hid,'قرار قبول',`${a.name}: ${DEC[to][0]}${extra}`);commit()},
+  addNote(id,text){const a=A(id);guard('application','e',a.hid);if(!text?.trim())fail('اكتب الملاحظة.');a.notes.push({at:now(),by:UI.user,text:text.trim()});commit()},
+  bulk(ids,fn){const ok=[],failed=[];ids.forEach(id=>{try{fn(id);ok.push(id)}catch(e){failed.push({id,name:A(id)?.name||id,msg:e.message})}});return {ok,failed}},
+  saveTeam(hid,d){guard('team',d.id?'e':'c',hid);if(!d.name?.trim())fail('اسم الفريق مطلوب.');
+    if(teamsOf(hid).some(t=>t.id!==d.id&&t.name.trim()===d.name.trim()))fail('يوجد فريق بالاسم نفسه.');
+    if(d.challengeId&&DB.challenges.find(c=>c.id===d.challengeId)?.trackId!==d.trackId)fail('التحدي المختار لا يتبع المسار المختار.');
+    if(d.room&&!/^https?:\/\//.test(d.room))fail('رابط الغرفة يجب أن يبدأ بـ https://');
+    const h=H(hid);if(!d.id&&teamsOf(hid).length>=h.maxTeams)fail(`وصل عدد الفرق للحد الأقصى (${h.maxTeams}).`);
+    let tm;if(d.id){tm=TM(d.id);const p=projOfTeam(tm.id);if(p&&p.trackId!==d.trackId&&['eligible','evaluated','final'].includes(p.status))fail('مشروع الفريق في مرحلة التحكيم. لا يمكن تغيير المسار.');
+      Object.assign(tm,d);if(p){p.trackId=tm.trackId;p.challengeId=tm.challengeId}}
+    else{tm={roomVis:'admins',leaderId:null,...d,id:uid('T'),hid,v:1};DB.teams.push(tm)}
+    log(hid,d.id?'تعديل فريق':'إنشاء فريق',tm.name);commit();return tm},
+  deleteTeam(id){const tm=TM(id);guard('team','d',tm.hid);if(projOfTeam(id))fail('للفريق مشروع مسجل. احذف المشروع أو انقله أولًا.');
+    membersOf(id).forEach(a=>{a.teamId=null;a.history.push({at:now(),by:UI.user,text:`أُزيل من فريق محذوف: ${tm.name}`})});DB.teams=DB.teams.filter(t=>t.id!==id);log(tm.hid,'حذف فريق',tm.name);commit()},
+  assign(appId,teamId){const a=A(appId),tm=TM(teamId);guard('team','e',a.hid);
+    if(tm.hid!==a.hid)fail('لا يمكن الإسناد لفريق من هاكاثون آخر.');
+    if(a.decision!=='accepted')fail('يُسند المقبولون فقط إلى الفرق.');
+    if(a.teamId===teamId)fail('المشارك عضو في هذا الفريق بالفعل.');
+    const h=H(a.hid);if(membersOf(teamId).length>=h.teamMax)fail(`اكتمل الفريق «${tm.name}» (الحد الأقصى ${h.teamMax}).`);
+    const p=projOfTeam(teamId);if(p&&['eligible','evaluated','final'].includes(p.status)&&!can('team','d',a.hid))fail('مشروع الفريق في التحكيم. نقل الأعضاء يحتاج صلاحية مدير الهاكاثون.');
+    const from=a.teamId?TM(a.teamId):null;if(from&&from.leaderId===a.id)from.leaderId=null;
+    a.teamId=teamId;a.v++;a.history.push({at:now(),by:UI.user,text:from?`نُقل من ${from.name} إلى ${tm.name}`:`أُسند إلى ${tm.name}`});
+    log(a.hid,from?'نقل مشارك':'إسناد مشارك',`${a.name} ← ${tm.name}`);commit()},
+  unassign(appId){const a=A(appId);guard('team','e',a.hid);const tm=TM(a.teamId);if(!tm)return;if(tm.leaderId===a.id)tm.leaderId=null;
+    a.teamId=null;a.history.push({at:now(),by:UI.user,text:`أُزيل من ${tm.name}`});log(a.hid,'إزالة عضو من فريق',`${a.name} — ${tm.name}`);commit()},
+  setLeader(teamId,appId){const tm=TM(teamId);guard('team','e',tm.hid);if(A(appId)?.teamId!==teamId)fail('القائد يجب أن يكون عضوًا في الفريق.');tm.leaderId=appId;log(tm.hid,'تحديد قائد فريق',`${tm.name}: ${A(appId).name}`);commit()},
+  saveProject(hid,d){guard('project',d.id?'e':'c',hid);if(!d.title?.trim())fail('عنوان الفكرة مطلوب.');
+    const tm=TM(d.teamId);if(!tm||tm.hid!==hid)fail('اختر فريقًا من هذا الهاكاثون.');
+    if(DB.projects.some(p=>p.teamId===d.teamId&&p.id!==d.id))fail('لهذا الفريق مشروع مسجل بالفعل.');
+    if(d.prototypeUrl&&!/^https?:\/\//.test(d.prototypeUrl))fail('رابط النموذج الأولي يجب أن يبدأ بـ https://');
+    let p;if(d.id){p=PR(d.id);if(['eligible','evaluated','final'].includes(p.status)&&p.teamId!==d.teamId)fail('لا يمكن تغيير فريق مشروع في مرحلة التحكيم.');
+      Object.assign(p,d,{trackId:tm.trackId,challengeId:tm.challengeId});p.v++;p.history.push({at:now(),by:UI.user,text:'تعديل بيانات المشروع'})}
+    else{p={problem:'',solution:'',impact:'',beneficiaries:'',partners:'',prototypeUrl:'',pitchUrl:'',...d,id:uid('p'),hid,trackId:tm.trackId,challengeId:tm.challengeId,status:'draft',submissions:[],
+      follow:{status:'none',owner:'',adoptingEntity:'',criteria:'',stage:'',evidence:'',notes:''},history:[{at:now(),by:UI.user,text:'إنشاء المشروع (مسودة)'}],v:1};DB.projects.push(p)}
+    log(hid,d.id?'تعديل مشروع':'إنشاء مشروع',p.title);commit();return p},
+  addSubmission(id,note){const p=PR(id);guard('project','e',p.hid);const h=H(p.hid);const n=p.submissions.length+1;const late=h.submissionDeadline&&now()>new Date(h.submissionDeadline).toISOString();
+    p.submissions.push({n,at:now(),note:note||'',checklist:3,late:!!late});p.history.push({at:now(),by:UI.user,text:`تسجيل نسخة تسليم ${n}`+(late?' (بعد الموعد النهائي)':'')});log(p.hid,'تسليم نسخة',`${p.title} — نسخة ${n}`);commit()},
+  setProjStatus(id,to,note){const p=PR(id);guard('project',['eligible','final'].includes(to)?'a':'e',p.hid);
+    if(!(PROJ_T[p.status]||[]).includes(to))fail(`لا يمكن الانتقال من «${PROJ[p.status][0]}» إلى «${PROJ[to][0]}».`);
+    if(to==='submitted'&&!p.submissions.length)fail('سجّل نسخة تسليم واحدة على الأقل قبل تقديم المشروع.');
+    if(to==='needs_changes'&&!note?.trim())fail('وضّح التعديلات المطلوبة.');
+    if(to==='eligible'&&!TM(p.teamId)?.trackId)fail('الفريق غير مربوط بمسار.');
+    if(to==='eligible'&&!DB.judgeTracks.some(j=>j.trackId===p.trackId))fail('لا يوجد محكم مسند لمسار هذا المشروع. أسند محكمًا أولًا.');
+    if(to==='evaluated'){const req=requiredJudges(p);const sub=DB.evals.filter(e=>e.projectId===p.id&&e.status==='submitted'&&req.includes(e.judgeId));if(sub.length<req.length)fail(`اكتمل ${sub.length} من ${req.length} تقييمات فقط.`)}
+    if(to==='final'&&!['approved','published'].includes(H(p.hid).results.state))fail('القرار النهائي يتطلب اعتماد النتائج أولًا.');
+    const from=p.status;p.status=to;p.v++;p.history.push({at:now(),by:UI.user,text:`${PROJ[from][0]} ← ${PROJ[to][0]}`+(note?` — ${note}`:'')});
+    log(p.hid,'تغيير حالة مشروع',`${p.title}: ${PROJ[to][0]}`);commit()},
+  saveFollow(id,f){const p=PR(id);guard('project','e',p.hid);if(['adopted','in_dev','delivered'].includes(f.status)&&!f.owner?.trim())fail('حدّد مسؤول المتابعة.');
+    if(f.status==='adopted'&&!f.adoptingEntity?.trim())fail('اذكر الجهة المتبنية.');
+    const from=p.follow.status;p.follow={...p.follow,...f};if(from!==f.status)p.history.push({at:now(),by:UI.user,text:`المتابعة: ${FOLLOW[from][0]} ← ${FOLLOW[f.status][0]}`});
+    log(p.hid,'تحديث متابعة حل',p.title);commit()},
+  setJudgeTrack(hid,judgeId,trackId,on){guard('judging','e',hid);const j=U(judgeId);if(j.role!=='judge')fail('المستخدم ليس محكمًا.');if(!inScope(j,hid))fail('المحكم غير مضاف لنطاق هذا الهاكاثون. عدّل نطاقه من المستخدمين.');
+    const ex=DB.judgeTracks.find(x=>x.hid===hid&&x.judgeId===judgeId&&x.trackId===trackId);
+    if(on&&!ex)DB.judgeTracks.push({hid,judgeId,trackId});
+    if(!on&&ex){if(DB.evals.some(e=>e.judgeId===judgeId&&e.status==='submitted'&&PR(e.projectId)?.trackId===trackId))fail('للمحكم تقييمات مسلّمة في هذا المسار. أعد فتحها أو احتفظ بالإسناد.');
+      DB.judgeTracks=DB.judgeTracks.filter(x=>x!==ex);DB.evals=DB.evals.filter(e=>!(e.judgeId===judgeId&&e.status==='draft'&&PR(e.projectId)?.trackId===trackId))}
+    markStale(hid,'تغيير إسناد المحكمين');log(hid,on?'إسناد محكم لمسار':'إلغاء إسناد محكم',`${j.name} — ${T(trackId).nameAr}`);commit()},
+  declareCOI(projectId,judgeId,reason){const p=PR(projectId);const u=me();
+    if(!(u.id===judgeId&&u.role==='judge'&&inScope(u,p.hid))&&!can('judging','c',p.hid))throw new Denied('لا تملك صلاحية تسجيل إفصاح عن تعارض مصالح.');
+    if(!reason?.trim())fail('اكتب طبيعة التعارض.');if(DB.coi.some(c=>c.projectId===projectId&&c.judgeId===judgeId&&c.status!=='rejected'))fail('يوجد إفصاح مسجل لهذا المحكم على المشروع.');
+    DB.coi.push({id:uid('coi'),hid:p.hid,judgeId,projectId,reason:reason.trim(),status:'pending',at:now(),by:u.id});log(p.hid,'إفصاح عن تعارض مصالح',`${uname(judgeId)} — ${p.title}`);commit()},
+  resolveCOI(id,status){const c=DB.coi.find(x=>x.id===id);guard('judging','a',c.hid);if(c.status!=='pending')fail('تمت معالجة هذا الإفصاح.');
+    c.status=status;c.resolvedBy=UI.user;c.resolvedAt=now();
+    if(status==='approved'){DB.evals=DB.evals.filter(e=>!(e.projectId===c.projectId&&e.judgeId===c.judgeId&&e.status==='draft'));
+      markStale(c.hid,'استبعاد محكم بسبب تعارض مصالح')}
+    log(c.hid,status==='approved'?'اعتماد استبعاد محكم':'رفض طلب استبعاد',`${uname(c.judgeId)} — ${PR(c.projectId).title}`);commit()},
+  saveSession(hid,d){guard('judging',d.id?'e':'c',hid);
+    if(!d.title?.trim())fail('عنوان الجلسة مطلوب.');if(!d.start)fail('حدد موعد الجلسة.');if(!(+d.duration>0))fail('المدة يجب أن تكون أكبر من صفر.');
+    if(!d.room?.trim())fail('حدد القاعة أو الغرفة الافتراضية.');if(!d.judgeIds.length)fail('اختر محكمًا واحدًا على الأقل.');if(!d.projectIds.length)fail('اختر مشروعًا واحدًا على الأقل.');
+    const errs=[];d.projectIds.forEach(pid=>{const p=PR(pid);d.judgeIds.forEach(jid=>{if(!requiredJudges(p).includes(jid))errs.push(`${uname(jid)} غير مسند لمسار «${p.title}» أو مستبعد منه`)})});
+    const s0=new Date(d.start).getTime(),e0=s0+d.duration*60000;
+    DB.sessions.filter(s=>s.hid===hid&&s.id!==d.id).forEach(s=>{const s1=new Date(s.start).getTime(),e1=s1+s.duration*60000;if(!(s0<e1&&s1<e0))return;
+      d.judgeIds.filter(j=>s.judgeIds.includes(j)).forEach(j=>errs.push(`تعارض: ${uname(j)} لديه «${s.title}» في الوقت نفسه`));
+      d.projectIds.filter(p=>s.projectIds.includes(p)).forEach(p=>errs.push(`تعارض: فريق «${TM(PR(p).teamId).name}» مجدول في «${s.title}»`));
+      if(s.room.trim()===d.room.trim())errs.push(`تعارض: ${d.room} محجوزة لجلسة «${s.title}»`)});
+    if(errs.length)fail(errs.join(' • '));
+    if(d.id)Object.assign(DB.sessions.find(s=>s.id===d.id),d);else DB.sessions.push({...d,id:uid('s'),hid});
+    log(hid,d.id?'تعديل جلسة تحكيم':'جدولة جلسة تحكيم',`${d.title} — ${fmtDT(d.start)}`);commit()},
+  deleteSession(id){const s=DB.sessions.find(x=>x.id===id);guard('judging','d',s.hid);DB.sessions=DB.sessions.filter(x=>x.id!==id);log(s.hid,'حذف جلسة',s.title);commit()},
+  saveEval(projectId,scores,comment,submit){const p=PR(projectId);const u=me();guard('evaluation','c',p.hid);
+    if(u.role!=='judge')fail('التقييم متاح لحسابات المحكمين فقط.');
+    if(!judgeCanSee(p,u.id))throw new Denied('هذا المشروع غير مسند إليك أو ليس في مرحلة التحكيم.');
+    const h=H(p.hid);const crit=critOf(p.trackId);let ev=DB.evals.find(e=>e.projectId===projectId&&e.judgeId===u.id);
+    if(ev&&ev.status==='submitted')fail('سلّمت هذا التقييم نهائيًا. إعادة فتحه تتم من مسؤول التحكيم مع ذكر السبب.');
+    const clean={};crit.forEach(c=>{const v=scores[c.code];clean[c.code]=v===''||v==null?null:+v;
+      if(clean[c.code]!=null&&(clean[c.code]<h.scoreMin||clean[c.code]>h.scoreMax))fail(`درجة «${c.nameAr}» خارج المقياس (${h.scoreMin}–${h.scoreMax}).`)});
+    if(submit){const miss=crit.filter(c=>clean[c.code]==null);if(miss.length)fail('أكمل درجات: '+miss.map(c=>c.nameAr).join('، '))}
+    if(!ev){ev={id:uid('e'),hid:p.hid,projectId,judgeId:u.id,reopens:[]};DB.evals.push(ev)}
+    Object.assign(ev,{scores:clean,comment:comment||'',status:submit?'submitted':'draft',at:now()});
+    if(submit){markStale(p.hid,'تسليم تقييم جديد');log(p.hid,'تسليم تقييم نهائي',p.title)}commit()},
+  reopenEval(id,reason){const ev=DB.evals.find(e=>e.id===id);guard('evaluation','a',ev.hid);if(ev.status!=='submitted')fail('التقييم ليس مسلّمًا.');if(!reason?.trim())fail('سبب إعادة الفتح مطلوب.');
+    ev.status='draft';ev.reopens.push({at:now(),by:UI.user,reason:reason.trim()});markStale(ev.hid,'إعادة فتح تقييم');
+    log(ev.hid,'إعادة فتح تقييم',`${uname(ev.judgeId)} — ${PR(ev.projectId).title}: ${reason}`);commit()},
+  calcResults(hid){guard('results','c',hid);const h=H(hid);h.results={...h.results,...computeResults(hid),state:'calculated',stale:false,calcAt:now(),calcBy:UI.user,approvedAt:null,approvedBy:null};
+    log(hid,'احتساب النتائج',`${h.results.rows.length} مشروعًا`);commit()},
+  approveResults(hid){guard('results','a',hid);const r=H(hid).results;const h=H(hid);
+    if(r.state!=='calculated')fail('احتسب النتائج أولًا.');if(r.stale)fail('تغيّرت التقييمات بعد الاحتساب. أعد الاحتساب قبل الاعتماد.');
+    if(h.incompletePolicy==='block'&&r.rows.some(x=>!x.complete))fail('توجد مشاريع بتقييمات ناقصة. سياسة الهاكاثون تمنع الاعتماد حتى تكتمل.');
+    if(r.rows.some(x=>x.tieUnresolved))fail('يوجد تعادل يحتاج قرارًا يدويًا موثقًا.');
+    r.state='approved';r.approvedAt=now();r.approvedBy=UI.user;log(hid,'اعتماد النتائج','');commit()},
+  publishResults(hid){guard('results','p',hid);const r=H(hid).results;if(r.state!=='approved')fail('النشر يتطلب نتائج معتمدة.');r.state='published';r.publishedAt=now();r.publishedBy=UI.user;log(hid,'نشر النتائج','حقول النشر: المسار، المركز، الفريق، عنوان المشروع');commit()},
+  unpublishResults(hid){guard('results','p',hid);const r=H(hid).results;if(r.state!=='published')fail('النتائج غير منشورة.');r.state='approved';log(hid,'إيقاف نشر النتائج','');commit()},
+  adjustRank(hid,projectId,rank,reason){guard('results','a',hid);if(!reason?.trim())fail('سبب التعديل الإداري مطلوب.');if(!(+rank>=1))fail('المركز يجب أن يكون رقمًا موجبًا.');
+    const r=H(hid).results;if(r.state==='none')fail('احتسب النتائج أولًا.');r.overrides={...(r.overrides||{}),[projectId]:{rank:+rank,reason:reason.trim(),by:UI.user,at:now()}};
+    Object.assign(r,computeResults(hid));r.state='calculated';r.approvedAt=null;log(hid,'تعديل إداري على الترتيب',`${PR(projectId).title} ← المركز ${rank}: ${reason}`);commit()},
+  saveUser(d){guard('users',d.id?'e':'c');if(!d.name?.trim())fail('الاسم مطلوب.');if(!/^\S+@\S+\.\S+$/.test(d.email||''))fail('البريد الإلكتروني غير صحيح.');
+    if(DB.users.some(u=>u.id!==d.id&&u.email.toLowerCase()===d.email.toLowerCase()))fail('البريد مستخدم لحساب آخر.');
+    if(d.role!=='admin'&&d.scope!=='all'&&!d.scope.length)fail('حدّد هاكاثونًا واحدًا على الأقل في نطاق المستخدم.');
+    if(d.id===UI.user&&d.role!==me().role)fail('لا يمكنك تغيير دورك بنفسك.');
+    let u;if(d.id){u=U(d.id);Object.assign(u,d)}else{u={active:true,...d,id:uid('u')};DB.users.push(u)}log(null,d.id?'تعديل مستخدم':'إضافة مستخدم',`${u.name} — ${ROLES[u.role]}`);commit();return u},
+  setActive(id,on){guard('users','e');if(id===UI.user)fail('لا يمكنك إيقاف حسابك.');U(id).active=on;log(null,on?'تفعيل حساب':'إيقاف حساب',U(id).name);commit()}
+};
+
+/* ---------- results engine ---------- */
+function projectScore(p){const h=H(p.hid);const crit=critOf(p.trackId);const req=requiredJudges(p);
+  const evs=DB.evals.filter(e=>e.projectId===p.id&&e.status==='submitted'&&req.includes(e.judgeId));
+  const per=evs.map(e=>sum(crit.map(c=>(e.scores[c.code]/h.scoreMax)*c.weight)));
+  const critAvg={};crit.forEach(c=>{critAvg[c.code]=avg(evs.map(e=>e.scores[c.code]))});
+  const drafts=DB.evals.filter(e=>e.projectId===p.id&&e.status==='draft'&&req.includes(e.judgeId)).length;
+  return {req,evs,per,score:per.length?avg(per):null,critAvg,complete:req.length>0&&evs.length===req.length,drafts}}
+function computeResults(hid){const h=H(hid);const ov=h.results.overrides||{};const rows=[];
+  tracksOf(hid).forEach(tr=>{const ps=projectsOf(hid).filter(p=>p.trackId===tr.id&&['eligible','evaluated','final'].includes(p.status));
+    let list=ps.map(p=>{const s=projectScore(p);return {projectId:p.id,trackId:tr.id,teamId:p.teamId,score:s.score,critAvg:s.critAvg,complete:s.complete,done:s.evs.length,required:s.req.length,rank:null,prize:'',tie:false,tieUnresolved:false,adjusted:null,excluded:false}});
+    list.forEach(x=>{x.excluded=x.score==null||(h.incompletePolicy==='block'&&!x.complete)});
+    const ranked=list.filter(x=>!x.excluded);
+    const cmp=(a,b)=>{const d=b.score-a.score;if(Math.abs(d)>1e-9)return d;if(h.tieRule==='criteria'){for(const k of h.tieOrder||[]){const e=(b.critAvg[k]||0)-(a.critAvg[k]||0);if(Math.abs(e)>1e-9)return e}}return 0};
+    ranked.sort(cmp);let rk=0;ranked.forEach((x,i)=>{if(i>0&&cmp(ranked[i-1],x)===0){x.rank=ranked[i-1].rank;x.tie=ranked[i-1].tie=true}else{rk=i+1;x.rank=rk}});
+    ranked.forEach(x=>{if(x.tie&&h.tieRule!=='shared')x.tieUnresolved=true});
+    ranked.forEach(x=>{const o=ov[x.projectId];if(o){x.rank=o.rank;x.adjusted=o;x.tieUnresolved=false}});
+    // resolved if every tied group now has distinct ranks
+    const byRank={};ranked.forEach(x=>{(byRank[x.rank]=byRank[x.rank]||[]).push(x)});ranked.forEach(x=>{if(h.tieRule!=='shared'&&byRank[x.rank].length>1&&!x.adjusted)x.tieUnresolved=true;if(byRank[x.rank].length===1)x.tieUnresolved=false});
+    ranked.sort((a,b)=>a.rank-b.rank);ranked.forEach(x=>{if(x.rank<=tr.winners)x.prize=tr.prizes[x.rank-1]||`المركز ${x.rank}`});
+    rows.push(...ranked,...list.filter(x=>x.excluded))});
+  return {rows}}
+
+/* =========================================================
+   UI helpers
+   ========================================================= */
+function toast(msg,bad){const id=uid('t');UI.toasts.push({id,msg,bad});renderToasts();setTimeout(()=>{UI.toasts=UI.toasts.filter(x=>x.id!==id);renderToasts()},bad?6000:3200)}
+async function run(fn,okMsg){try{const r=await fn();if(okMsg)toast(okMsg);render();return r===undefined?true:r}catch(e){render();toast(e.message,true);return false}}
+function confirmBox(o){UI.modal=o;render()}
+function go(page,extra){UI.page=page;UI.drawer=null;UI.nav=false;Object.assign(UI,extra||{});render();const m=document.getElementById('main');if(m){m.scrollTop=0;window.scrollTo(0,0)}}
+function denied(msg){return `<div class="card denied"><div class="code">403</div><h2>لا تملك صلاحية الوصول</h2><p class="muted" style="max-width:52ch">${esc(msg||'هذه الصفحة غير متاحة لدورك الحالي. تواصل مع مدير النظام إذا كنت تحتاج الوصول.')}</p></div>`}
+const empty=(title,hint,btn)=>`<div class="empty"><b>${esc(title)}</b><span>${esc(hint||'')}</span>${btn||''}</div>`;
+const head=(crumb,title,sub,acts)=>`<div class="ph"><div><div class="crumb">${crumb}</div><h1>${esc(title)}</h1>${sub?`<div class="sub">${sub}</div>`:''}</div><div class="acts">${acts||''}</div></div>`;
+const btn=(label,a,data,cls,dis)=>`<button class="btn ${cls||''}" data-a="${a}" ${Object.entries(data||{}).map(([k,v])=>`data-${k}="${esc(v)}"`).join(' ')} ${dis?'disabled':''}>${label}</button>`;
+const kpi=(l,v,unit,col,s,go_)=>`<${go_?'button':'div'} class="kpi" style="--k:var(--${col})" ${go_?`data-a="go" data-p="${go_}"`:''}><span class="l">${esc(l)}</span><span class="v">${v}<small>${esc(unit||'')}</small></span>${s?`<span class="s">${s}</span>`:''}</${go_?'button':'div'}>`;
+const ICON={
+  home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',flag:'<path d="M5 21V4m0 0h11l-2 4 2 4H5"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.5 3.3-5.5 6.5-5.5s5.9 2 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c1.9.7 3.2 2.5 3.5 5.2"/>',
+  shield:'<path d="M12 3l8 3v6c0 4.5-3.3 8-8 9-4.7-1-8-4.5-8-9V6z"/>',log:'<path d="M7 4h11v16H7zM4 8h3M4 12h3M4 16h3M10 9h5M10 13h5"/>',book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM8 7h7"/>',
+  grid:'<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+  route:'<circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/>',scale:'<path d="M12 3v18M5 21h14M6 7h12M6 7l-3 7h6zM18 7l-3 7h6z"/>',
+  inbox:'<path d="M3 13l3-8h12l3 8v6H3zM3 13h5l1 3h6l1-3h5"/>',team:'<circle cx="12" cy="7" r="3"/><circle cx="5" cy="10" r="2.2"/><circle cx="19" cy="10" r="2.2"/><path d="M7 20c.4-3.4 2.4-5.5 5-5.5s4.6 2.1 5 5.5M1.5 18c.3-2 1.6-3.3 3.5-3.6M22.5 18c-.3-2-1.6-3.3-3.5-3.6"/>',
+  bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',gavel:'<path d="M14 4l6 6M11 7l6 6M12.5 5.5l-6 6 6 6M3 21l7-7"/>',trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0zM5 5H3v2a4 4 0 0 0 4 4M19 5h2v2a4 4 0 0 1-4 4M12 14v4M8 21h8"/>',
+  sprout:'<path d="M12 21v-9M12 12C12 7 8 5 4 5c0 4 3 7 8 7zM12 14c0-4 3-6 8-6 0 4-3 6-8 6z"/>',cal:'<path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/>',bank:'<path d="M3 10l9-6 9 6M5 10v8M10 10v8M14 10v8M19 10v8M3 21h18"/>',
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/>',mentor:'<path d="M12 4l9 4-9 4-9-4zM7 10v5c0 1.5 2.5 3 5 3s5-1.5 5-3v-5"/>',cert:'<circle cx="12" cy="9" r="5"/><path d="M9 13.5L7.5 21l4.5-2.5 4.5 2.5L15 13.5"/>',
+  folder:'<path d="M3 6h7l2 2h9v11H3z"/>',star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/>',
+  building:'<path d="M4 21V5h10v16M14 9h6v12M7 8h4M7 12h4M7 16h4"/>',leaf:'<path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15M5 19l7-7"/>',bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',chip:'<path d="M7 7h10v10H7zM10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/>',heart:'<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',lang:'<path d="M3 5h10M8 3v2M5 5c1 4 4 7 7 8M11 5c-1 4-4 7-7 8M13 21l4-10 4 10M14.5 17h5"/>'};
+const ic=(n,s=17)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]||''}</svg>`;
+
+/* ---------- generic table ---------- */
+function table(id,cols,rows,o={}){
+  const st=UI.tables[id]||(UI.tables[id]={q:'',sort:o.sort||null,dir:o.dir||1,page:1,size:10,hidden:o.hidden||[],f:{}});
+  let r=rows;const txt=(c,x)=>c.text?String(c.text(x)??''):'';
+  if(st.q){const q=st.q.trim().toLowerCase();r=r.filter(x=>cols.some(c=>txt(c,x).toLowerCase().includes(q)))}
+  (o.filters||[]).forEach(f=>{const v=st.f[f.key];if(v)r=r.filter(x=>String(f.get(x))===v)});
+  if(st.sort){const c=cols.find(c=>c.key===st.sort);if(c){const g=c.sortv||(x=>txt(c,x));r=[...r].sort((a,b)=>{const A_=g(a),B_=g(b);return (A_>B_?1:A_<B_?-1:0)*st.dir})}}
+  const total=r.length,pages=Math.max(1,Math.ceil(total/st.size));st.page=Math.min(st.page,pages);
+  const slice=r.slice((st.page-1)*st.size,st.page*st.size);const vis=cols.filter(c=>!st.hidden.includes(c.key));
+  const sel=UI.sel[id]||(UI.sel[id]=new Set());if(o.select)[...sel].forEach(k=>{if(!rows.some(x=>x.id===k))sel.delete(k)});
+  const allOn=o.select&&slice.length&&slice.every(x=>sel.has(x.id));
+  let h=`<div class="toolbar"><label class="sr" for="${id}-q">بحث</label><input type="search" id="${id}-q" placeholder="بحث…" value="${esc(st.q)}" data-in="tq" data-t="${id}">`;
+  (o.filters||[]).forEach(f=>{h+=`<label class="sr" for="${id}-f-${f.key}">${esc(f.label)}</label><select id="${id}-f-${f.key}" data-ch="tf" data-t="${id}" data-k="${f.key}"><option value="">${esc(f.label)}: الكل</option>${f.opts.map(([v,l])=>`<option value="${esc(v)}" ${st.f[f.key]===v?'selected':''}>${esc(l)}</option>`).join('')}</select>`});
+  h+=`<span class="sp"></span>${o.tools||''}<details class="cols"><summary class="btn sm">الأعمدة</summary><div class="menu">${cols.filter(c=>!c.fixed).map(c=>`<label class="chk"><input type="checkbox" data-ch="tcol" data-t="${id}" data-k="${c.key}" ${st.hidden.includes(c.key)?'':'checked'}> ${esc(c.label)}</label>`).join('')}</div></details></div>`;
+  if(o.select&&sel.size)h+=`<div class="bulk"><b>${sel.size}</b> محدد ${o.bulk?o.bulk([...sel]):''}<button class="lnk" data-a="tclear" data-t="${id}">إلغاء التحديد</button></div>`;
+  h+=`<div class="tbl-wrap"><table class="tbl"><thead><tr>${o.select?`<th style="width:34px"><input type="checkbox" aria-label="تحديد الصفحة" data-ch="tall" data-t="${id}" ${allOn?'checked':''}></th>`:''}${vis.map(c=>`<th>${c.nosort?esc(c.label):`<button data-a="tsort" data-t="${id}" data-k="${c.key}">${esc(c.label)}${st.sort===c.key?(st.dir>0?' ↑':' ↓'):''}</button>`}</th>`).join('')}</tr></thead><tbody>`;
+  if(!slice.length)h+=`<tr><td colspan="${vis.length+(o.select?1:0)}">${empty(rows.length?'لا توجد نتائج مطابقة':(o.emptyTitle||'لا توجد سجلات بعد'),rows.length?'غيّر البحث أو الفلاتر.':(o.emptyHint||''))}</td></tr>`;
+  slice.forEach(x=>{h+=`<tr ${o.row?`class="click" data-a="${o.row}" data-id="${esc(x.id)}" tabindex="0"`:''}>${o.select?`<td><input type="checkbox" aria-label="تحديد" data-ch="tsel" data-t="${id}" data-id="${esc(x.id)}" ${sel.has(x.id)?'checked':''}></td>`:''}${vis.map(c=>`<td class="${c.num?'n':''}">${c.html?c.html(x):esc(txt(c,x))}</td>`).join('')}</tr>`});
+  const pgs=[];for(let i=1;i<=pages;i++){if(i===1||i===pages||Math.abs(i-st.page)<=1)pgs.push(i);else if(pgs[pgs.length-1]!=='…')pgs.push('…')}
+  h+=`</tbody></table></div><div class="pager"><span>عرض <span class="num">${total?(st.page-1)*st.size+1:0}–${Math.min(st.page*st.size,total)}</span> من <span class="num">${total}</span></span>
+   <label>لكل صفحة <select data-ch="tsize" data-t="${id}">${[10,25,50].map(n=>`<option ${st.size===n?'selected':''}>${n}</option>`).join('')}</select></label>
+   <span class="pg">${pgs.map(p=>p==='…'?'<span>…</span>':`<button class="${p===st.page?'on':''}" data-a="tpage" data-t="${id}" data-k="${p}" aria-label="صفحة ${p}">${p}</button>`).join('')}</span></div>`;
+  return `<div class="card" style="overflow:hidden">${h}</div>`}
+function csvOf(cols,rows){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;return '﻿'+[cols.map(c=>q(c.label)).join(','),...rows.map(r=>cols.map(c=>q(c.text(r))).join(','))].join('\n')}
+function exportBox(title,cols,rows,res){if(!can(res,'x',UI.hid))return toast('لا تملك صلاحية التصدير.',true);  confirmBox({title:`تصدير: ${title}`,body:`<p class="muted">انسخ النص والصقه في ملف بامتداد <span class="mono">.csv</span> ثم افتحه في Excel. العربية مدعومة (UTF-8 مع BOM). التنزيل المباشر غير متاح داخل هذه المعاينة.</p><textarea id="csvbox" readonly style="width:100%;min-height:180px;font-family:var(--f-data);font-size:.75rem">${esc(csvOf(cols,rows))}</textarea>`,ok:'نسخ',fn:()=>{const el=document.getElementById('csvbox');navigator.clipboard?.writeText(el.value).then(()=>toast('تم النسخ'),()=>{el.select();toast('حدّد النص وانسخه يدويًا',true)});return false}})}
+
+/* =========================================================
+   Layout
+   ========================================================= */
+function visibleHackathons(){const u=me();return DB.hackathons.filter(h=>inScope(u,h.id))}
+function notifications(){const u=me();const out=[];visibleHackathons().forEach(h=>{
+  if(can('application','e',h.id)){const n=appsOf(h.id).filter(a=>a.decision==='pending'&&a.eligibility!=='needs_info').length;if(n)out.push([h,`${n} طلب ينتظر المراجعة`,'apps'])}
+  if(can('judging','a',h.id)){const n=DB.coi.filter(c=>c.hid===h.id&&c.status==='pending').length;if(n)out.push([h,`${n} إفصاح تعارض مصالح ينتظر الاعتماد`,'judging'])}
+  if(can('results','a',h.id)&&h.results.state==='calculated')out.push([h,'نتائج محتسبة تنتظر الاعتماد','results']);
+  if(u.role==='judge'){const n=projectsOf(h.id).filter(p=>judgeCanSee(p,u.id)&&DB.evals.find(e=>e.projectId===p.id&&e.judgeId===u.id)?.status!=='submitted').length;if(n)out.push([h,`${n} تقييم مطلوب منك`,'myreviews'])}});return out}
+function topbar(){const u=me();const hs=visibleHackathons();const h=H(UI.hid);const nt=notifications();
+  return `<header class="top"><button class="tbtn navtoggle" data-a="navt" aria-label="القائمة">${ic('menu')}</button>
+  <div class="brand"><span class="mark" aria-hidden="true"></span><span>إدارة الهاكاثونات</span></div>
+  <div class="hk-pick"><span class="lane" style="background:${esc(h?.color||'var(--ink-line)')}"></span><div style="display:grid;min-width:0"><label for="hkSel">${t('الهاكاثون النشط')}</label>
+  <select id="hkSel" data-ch="hk">${hs.length?'':'<option>لا يوجد هاكاثون في نطاقك</option>'}${hs.map(x=>`<option value="${x.id}" ${x.id===UI.hid?'selected':''}>${esc(x.nameAr)}${x.status==='archived'?' — مؤرشف':''}</option>`).join('')}</select></div>${h?pill(HST,h.status):''}</div>
+  <span class="grow"></span><span class="proto" style="border-style:solid">Airtable</span>
+  ${u.role!=='judge'?`<form class="search" data-form="gsearch" role="search"><label class="sr" for="gq">بحث</label><input id="gq" name="q" placeholder="${t('بحث في الهاكاثون…')}" value="${esc(UI.q)}"></form>`:''}
+  <details class="pop"><summary class="tbtn" aria-label="${t('الإشعارات')}">${ic('bell')}${nt.length?`<span class="dot">${nt.length}</span>`:''}</summary><div class="pop-body"><div class="cap">${t('الإشعارات')} — مشتقة من البيانات الحالية</div>${nt.length?nt.map(([hh,txt,p])=>`<button class="row" data-a="gohk" data-h="${hh.id}" data-p="${p}"><span>${esc(txt)}</span><span class="tag">${esc(hh.nameAr.split(' (')[0])}</span></button>`).join(''):'<div class="cap">لا توجد إجراءات معلقة.</div>'}</div></details>
+  <button class="tbtn" data-a="lang" aria-label="تبديل اللغة">${ic('lang')} ${UI.lang==='ar'?'EN':'ع'}</button>
+  <button class="tbtn" data-a="refresh" aria-label="تحديث البيانات" title="تحديث البيانات">↻</button>
+  <details class="pop"><summary class="tbtn">${esc(u.name)} <span class="tag" style="color:var(--ink-muted);border-color:var(--ink-line)">${esc(ROLES[u.role])}</span></summary><div class="pop-body"><div class="cap">${esc(u.email||'')}</div><button class="row" data-a="mypw"><span>تغيير كلمة المرور</span></button><button class="row" data-a="logout"><span>تسجيل الخروج</span></button></div></details></header>`}
+function sidebar(){const u=me();const h=H(UI.hid);const P=UI.page;
+  const nb=(p,label,icon,o={})=>`<button class="nav ${P===p?'on':''} ${o.muted?'muted':''}" data-a="go" data-p="${p}" ${P===p?'aria-current="page"':''}>${ic(icon)}<span>${t(label)}</span>${o.cnt?`<span class="cnt">${o.cnt}</span>`:''}${o.later?`<span class="later">${t('لاحقًا')}</span>`:''}</button>`;
+  let s=`<nav class="side ${UI.nav?'open':''}" aria-label="القائمة الرئيسية">`;
+  if(u.role==='judge'){s+=`<div class="grp">${t('التحكيم والنتائج')}</div>${nb('myreviews','تقييماتي','gavel')}${nb('about','فهم المنصة والخطة','book')}</nav>`;return s}
+  s+=`<div class="grp">${t('الشركة')}</div>${nb('dash','لوحة التحكم العامة','home')}${nb('hackathons','الهاكاثونات','flag')}${can('users','v')?nb('users','المستخدمون والصلاحيات','shield'):''}${can('audit','v')?nb('audit','سجل الأنشطة','log'):''}${nb('about','فهم المنصة والخطة','book')}`;
+  if(h){const pend=appsOf(h.id).filter(a=>a.decision==='pending').length;const una=appsOf(h.id).filter(a=>a.decision==='accepted'&&!a.teamId).length;
+    s+=`<div class="grp"><span>${t('الإعداد')}</span><b title="${esc(h.nameAr)}">${esc(h.nameAr.split(' (')[0])}</b></div>${nb('overview','نظرة عامة','grid')}${nb('settings','الإعدادات','gear')}${nb('tracks','المسارات والتحديات','route')}${nb('criteria','معايير التحكيم','scale')}
+    <div class="grp">${t('الفرز والقبول')}</div>${can('application','v',h.id)?nb('apps','المشاركون والطلبات','inbox',{cnt:pend||''}):''}
+    <div class="grp">${t('الفرق والمشاريع')}</div>${can('team','v',h.id)?nb('teams','الفرق','team',{cnt:una||''}):''}${can('project','v',h.id)?nb('projects','المشاريع والتسليمات','bulb'):''}
+    <div class="grp">${t('التحكيم والنتائج')}</div>${can('judging','v',h.id)?nb('judging','المحكمون والجلسات','gavel'):''}${can('results','v',h.id)?nb('results','النتائج والاعتماد','trophy'):''}
+    <div class="grp">${t('ما بعد الفعالية')}</div>${can('project','v',h.id)?nb('follow','متابعة الحلول','sprout'):''}
+    <div class="grp">${t('لاحقًا')}</div>${nb('later_agenda','الأجندة','cal',{later:1,muted:1})}${nb('later_partners','الجهات والشركاء','bank',{later:1,muted:1})}${nb('later_faq','الأسئلة الشائعة','help',{later:1,muted:1})}${nb('later_mentor','الإرشاد','mentor',{later:1,muted:1})}${nb('later_cert','الشهادات','cert',{later:1,muted:1})}${nb('later_files','الملفات والتقارير','folder',{later:1,muted:1})}`}
+  return s+'</nav>'}
+
+/* =========================================================
+   Pages — company level
+   ========================================================= */
+function phase(h){const n=Date.now(),d=s=>new Date(s).getTime();if(h.status==='archived')return 'مؤرشف';if(h.regStart&&n<d(h.regStart))return 'قبل فتح التسجيل';if(h.regEnd&&n<=d(h.regEnd))return 'التسجيل مفتوح';if(n<d(h.eventStart))return 'بين التسجيل والفعالية';if(n<=d(h.eventEnd))return 'الفعالية جارية';return 'انتهت الفعالية'}
+function pg_dash(){const hs=visibleHackathons().filter(h=>h.status!=='archived');
+  const tot={apps:0,ppl:0,teams:0,pend:0};hs.forEach(h=>{const a=appsOf(h.id);tot.apps+=a.length;tot.ppl+=a.filter(x=>x.decision==='accepted').length;tot.teams+=teamsOf(h.id).length;tot.pend+=a.filter(x=>x.decision==='pending').length});
+  return `<div class="wrap">${head(t('الشركة'),t('لوحة التحكم العامة'),'ملخص الهاكاثونات التي تملك صلاحية عليها. اختر هاكاثونًا لإدارته.',can('hackathon','c')?btn('هاكاثون جديد','go',{p:'hnew'},'pri'):'')}
+  <div class="kpis">${kpi('هاكاثونات نشطة',hs.length,'هاكاثون','accent')}${kpi('طلبات التسجيل',tot.apps,'طلب','info')}${kpi('المشاركون المقبولون',tot.ppl,'شخص','ok')}${kpi('الفرق',tot.teams,'فريق','purple')}${kpi('طلبات تنتظر المراجعة',tot.pend,'طلب','warn')}</div>
+  <div class="grid g2">${hs.length?hs.map(h=>{const a=appsOf(h.id);const ev=evalProgress(h.id);return `<div class="card hcard"><span class="lane" style="background:${esc(h.color)}"></span>
+   <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div><h2>${esc(h.nameAr)}</h2><div class="muted" style="font-size:.82rem">${MODE[h.mode]} · ${fmtD(h.eventStart)} → ${fmtD(h.eventEnd)}</div></div><div class="acts">${pill(HST,h.status)}<span class="tag">${phase(h)}</span></div></div>
+   <div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">${[['طلب',a.length],['شخص مقبول',a.filter(x=>x.decision==='accepted').length],['فريق',teamsOf(h.id).length],['مشروع',projectsOf(h.id).length]].map(([l,v])=>`<div><div class="num" style="font-size:1.3rem;font-weight:600">${v}</div><div class="muted" style="font-size:.76rem">${l}</div></div>`).join('')}</div>
+   <div style="display:grid;gap:4px"><div style="display:flex;justify-content:space-between;font-size:.8rem"><span class="muted">تقدم التقييمات</span><span class="num">${ev.done}/${ev.req}</span></div><div class="bar"><span style="width:${ev.req?ev.done/ev.req*100:0}%"></span></div></div>
+   <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:.82rem">النتائج: ${pill(RST,h.results.state)}</span>${btn('إدارة الهاكاثون','gohk',{h:h.id,p:'overview'},'sm')}</div></div>`}).join(''):`<div class="card">${empty('لا توجد هاكاثونات نشطة في نطاقك','اطلب من مدير النظام إضافتك إلى هاكاثون.')}</div>`}</div></div>`}
+function evalProgress(hid){let req=0,done=0,draft=0;projectsOf(hid).filter(p=>['eligible','evaluated','final'].includes(p.status)).forEach(p=>{const s=projectScore(p);req+=s.req.length;done+=s.evs.length;draft+=s.drafts});return {req,done,draft}}
+function pg_hackathons(){const u=me();const rows=visibleHackathons();
+  const cols=[{key:'name',label:'الاسم',text:h=>h.nameAr,html:h=>`<span class="trk"><i style="background:${esc(h.color)}"></i><b>${esc(h.nameAr)}</b></span>`,fixed:1},{key:'ed',label:'النسخة',text:h=>h.edition},{key:'mode',label:'الانعقاد',text:h=>MODE[h.mode]},
+    {key:'reg',label:'التسجيل',text:h=>`${fmtD(h.regStart)} → ${fmtD(h.regEnd)}`},{key:'ev',label:'الفعالية',text:h=>`${fmtD(h.eventStart)} → ${fmtD(h.eventEnd)}`,sortv:h=>h.eventStart},{key:'phase',label:'المرحلة',text:phase},
+    {key:'st',label:'الحالة',text:h=>HST[h.status][0],html:h=>pill(HST,h.status)},{key:'act',label:'',nosort:1,fixed:1,text:()=>'',html:h=>`<div class="acts">${btn('فتح','gohk',{h:h.id,p:'overview'},'sm')}${h.status!=='archived'&&can('hackathon','e',h.id)?btn('أرشفة','harch',{id:h.id},'sm'):''}${h.status==='archived'&&can('hackathon','e',h.id)?btn('استعادة','hunarch',{id:h.id},'sm'):''}</div>`}];
+  return `<div class="wrap">${head(t('الشركة'),t('الهاكاثونات'),'كل هاكاثون له بياناته وإعداداته وصلاحياته المنفصلة. الأرشفة تجعله للقراءة فقط.',can('hackathon','c')?btn('هاكاثون جديد','go',{p:'hnew'},'pri'):'')}
+  ${table('hk',cols,rows,{filters:[{key:'st',label:'الحالة',get:h=>h.status,opts:Object.entries(HST).map(([k,v])=>[k,v[0]])}],emptyTitle:'لا توجد هاكاثونات في نطاقك'})}</div>`}
+function hForm(h){const v=(k,d='')=>esc(h?h[k]??d:d);const isNew=!h;const crit=h?h.criteria:[];
+  return `<form class="form" data-form="hsave" data-id="${h?h.id:''}" novalidate>
+  <fieldset><legend>الهوية والوصف</legend><div class="fgrid">
+   <label class="field"><span>الاسم (عربي) <em>*</em></span><input id="f-nameAr" name="nameAr" required value="${v('nameAr')}"></label>
+   <label class="field"><span>الاسم (إنجليزي)</span><input id="f-nameEn" name="nameEn" dir="ltr" value="${v('nameEn')}"></label>
+   <label class="field"><span>النسخة</span><input id="f-edition" name="edition" value="${v('edition','2026')}"></label>
+   <label class="field"><span>اللون الأساسي للهوية</span><input id="f-color" name="color" type="color" value="${v('color','#0A7468')}"></label>
+   <label class="field full"><span>الوصف (عربي)</span><textarea id="f-descAr" name="descAr">${v('descAr')}</textarea></label>
+   <label class="field full"><span>الوصف (إنجليزي)</span><textarea id="f-descEn" name="descEn" dir="ltr">${v('descEn')}</textarea></label>
+   <label class="field"><span>الشعار</span><input id="f-logo" type="file" accept="image/*" data-ch="logo"><small>رفع الشعار من المنصة لم يُربط بعد. ارفعه مباشرة في حقل Logo في Airtable.</small></label>
+   <div class="field"><span>معاينة الشعار</span><div id="logoPrev">${h?.logo?`<img src="${h.logo}" alt="الشعار" style="max-height:48px">`:'<span class="muted">لا يوجد شعار</span>'}</div><input type="hidden" name="logo" id="f-logoData" value="${v('logo')}"></div>
+  </div></fieldset>
+  <fieldset><legend>المواعيد والانعقاد</legend><div class="fgrid">
+   <label class="field"><span>نوع الانعقاد <em>*</em></span><select id="f-mode" name="mode">${Object.entries(MODE).map(([k,l])=>`<option value="${k}" ${h?.mode===k?'selected':''}>${l}</option>`).join('')}</select></label>
+   <label class="field"><span>المنطقة الزمنية <em>*</em></span><select id="f-tz" name="tz">${['Asia/Riyadh','Asia/Dubai','Africa/Cairo','UTC'].map(z=>`<option ${h?.tz===z?'selected':''}>${z}</option>`).join('')}</select></label>
+   <label class="field"><span>بداية التسجيل</span><input id="f-regStart" type="datetime-local" name="regStart" value="${v('regStart')}"></label>
+   <label class="field"><span>نهاية التسجيل</span><input id="f-regEnd" type="datetime-local" name="regEnd" value="${v('regEnd')}"></label>
+   <label class="field"><span>بداية الفعالية <em>*</em></span><input id="f-eventStart" type="datetime-local" name="eventStart" value="${v('eventStart')}"></label>
+   <label class="field"><span>نهاية الفعالية <em>*</em></span><input id="f-eventEnd" type="datetime-local" name="eventEnd" value="${v('eventEnd')}"></label>
+  </div></fieldset>
+  <fieldset><legend>الفرق والتسجيل</legend><div class="fgrid">
+   <label class="field"><span>الحد الأدنى لحجم الفريق</span><input id="f-teamMin" type="number" min="1" name="teamMin" value="${v('teamMin',3)}"></label>
+   <label class="field"><span>الحد الأقصى لحجم الفريق</span><input id="f-teamMax" type="number" min="1" name="teamMax" value="${v('teamMax',5)}"></label>
+   <label class="field"><span>الحد الأقصى لعدد الفرق المؤكدة</span><input id="f-maxTeams" type="number" min="1" name="maxTeams" value="${v('maxTeams',15)}"></label>
+   <div class="field"><span>أنواع التسجيل</span><label class="chk"><input id="f-ai" type="checkbox" name="allowIndividual" ${!h||h.allowIndividual?'checked':''}> فردي</label><label class="chk"><input id="f-at" type="checkbox" name="allowTeam" ${!h||h.allowTeam?'checked':''}> ضمن فريق</label></div>
+   <label class="field"><span>الموعد النهائي لتشكيل الفريق</span><input id="f-formation" type="datetime-local" name="formationDeadline" value="${v('formationDeadline')}"></label>
+   <label class="field"><span>الموعد النهائي لتأكيد الفريق</span><input id="f-confirm" type="datetime-local" name="confirmDeadline" value="${v('confirmDeadline')}"></label>
+   <label class="field full"><span>شروط المشاركة والأهلية</span><textarea id="f-elig" name="eligibility">${v('eligibility')}</textarea></label>
+   <label class="field full"><span>سياسات المشاركة</span><textarea id="f-pol" name="policies">${v('policies')}</textarea></label>
+  </div></fieldset>
+  <fieldset><legend>التسليمات</legend><div class="fgrid">
+   <label class="field"><span>الموعد النهائي لتسليم الحلول</span><input id="f-subDl" type="datetime-local" name="submissionDeadline" value="${v('submissionDeadline')}"></label>
+   <label class="field"><span>الحد الأقصى لحجم الملف (كيلوبايت)</span><input id="f-kb" type="number" min="1" name="maxFileKB" value="${v('maxFileKB',20480)}"></label>
+   <label class="field full"><span>امتدادات الملفات المسموحة</span><input id="f-ext" name="extensions" dir="ltr" value="${v('extensions','pdf, pptx, ppt')}"><small>افصل بينها بفاصلة.</small></label>
+  </div></fieldset>
+  <fieldset><legend>التحكيم والنتائج</legend><div class="fgrid">
+   <label class="field"><span>الحد الأدنى للدرجة</span><input id="f-smin" type="number" name="scoreMin" value="${v('scoreMin',1)}"></label>
+   <label class="field"><span>الحد الأقصى للدرجة</span><input id="f-smax" type="number" name="scoreMax" value="${v('scoreMax',10)}"></label>
+   <label class="field"><span>التقييمات الناقصة</span><select id="f-inc" name="incompletePolicy">${Object.entries(INC).map(([k,l])=>`<option value="${k}" ${h?.incompletePolicy===k?'selected':''}>${l}</option>`).join('')}</select></label>
+   <label class="field"><span>قاعدة كسر التعادل</span><select id="f-tie" name="tieRule">${Object.entries(TIE).map(([k,l])=>`<option value="${k}" ${h?.tieRule===k?'selected':''}>${l}</option>`).join('')}</select></label>
+   <div class="field full"><span>ترتيب معايير كسر التعادل</span>${isNew||!crit.length?'<small>يُضبط بعد إضافة معايير التحكيم.</small>':`<div id="tieList" style="display:grid;gap:6px">${tieListHtml(h)}</div><small>يُقارن متوسط درجة المعيار الأول، ثم الثاني… وإن استمر التعادل يُطلب قرار يدوي موثّق.</small>`}</div>
+  </div></fieldset>
+  <div class="err" id="hErr" role="alert"></div>
+  <div class="acts">${btn(isNew?'إنشاء كمسودة':'حفظ التعديلات','hsubmit',{},'pri')}${!isNew?btn('معاينة المحتوى العام','hpreview',{id:h.id}):''}${!isNew&&h.status==='draft'&&can('hackathon','p',h.id)?btn('نشر','hpublish',{id:h.id}):''}${!isNew&&h.status==='published'&&can('hackathon','p',h.id)?btn('إرجاع لمسودة','hunpublish',{id:h.id}):''}</div></form>`}
+function tieListHtml(h,order,on){const all=h.criteria.filter(c=>c.enabled);on=on||new Set(h.tieOrder||[]);
+  order=order||[...(h.tieOrder||[]).filter(k=>all.some(c=>c.code===k)),...all.map(c=>c.code).filter(k=>!(h.tieOrder||[]).includes(k))];
+  return order.map((k,i)=>{const c=all.find(x=>x.code===k);if(!c)return '';return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label class="chk"><input type="checkbox" data-tie="${k}" ${on.has(k)?'checked':''}> <span class="num">${i+1}.</span> ${esc(c.nameAr)} <span class="tag mono">${esc(k)}</span></label>${i>0?`<button type="button" class="btn sm" data-a="tieup" data-k="${k}" aria-label="رفع ${esc(c.nameAr)}">↑</button>`:''}</div>`}).join('')+'<div class="muted" style="font-size:.8rem">ثم: قرار يدوي موثّق. المعايير غير المحددة لا تُستخدم في كسر التعادل.</div>'}
+function pg_hnew(){if(!can('hackathon','c'))return denied('إنشاء الهاكاثونات متاح لمدير النظام فقط.');
+  return `<div class="wrap">${head(`${t('الهاكاثونات')} › إضافة`,'إضافة هاكاثون','يُنشأ الهاكاثون كمسودة. لا يظهر للعامة حتى تنشره.')}<div class="card"><div class="bd">${hForm(null)}</div></div></div>`}
+
+/* ---------- users & permissions ---------- */
+function pg_users(){if(!can('users','v'))return denied();const tab=UI.tab.users||'list';
+  const cols=[{key:'name',label:'الاسم الكامل بالعربية',text:u=>u.name,html:u=>`<b>${esc(u.name)}</b>${u.id===UI.user?' <span class="tag">أنت</span>':''}`,fixed:1},{key:'en',label:'الاسم بالإنجليزية',text:u=>u.nameEn||''},{key:'email',label:'البريد الإلكتروني',text:u=>u.email},
+   {key:'role',label:'الدور',text:u=>ROLES[u.role],html:u=>`<span class="tag">${esc(ROLES[u.role])}</span>`},{key:'scope',label:'نطاق الهاكاثونات',text:u=>u.scope==='all'?'كل الهاكاثونات':u.scope.map(id=>H(id)?.nameAr.split(' (')[0]||id).join('، ')},
+   {key:'st',label:'الحالة',text:u=>u.active?'فعال':'موقوف',html:u=>u.active?'<span class="pill ok">فعال</span>':'<span class="pill bad">موقوف</span>'}];
+  const matrix=`<div class="card"><div class="hd"><div><h2>مصفوفة الصلاحيات</h2><div class="muted" style="font-size:.82rem">تُطبق في طبقة «الخادم» داخل النموذج (api) قبل أي تعديل، وتُطبق معها قيود نطاق الهاكاثون. الأدوار أولية قابلة للتعديل.</div></div></div>
+   <div class="tbl-wrap"><table class="tbl matrix"><thead><tr><th>الدور</th>${Object.values(RES).map(r=>`<th style="white-space:normal;min-width:84px">${esc(r)}</th>`).join('')}</tr></thead><tbody>
+   ${Object.entries(ROLES).map(([k,l])=>`<tr><td><b>${esc(l)}</b></td>${Object.keys(RES).map(r=>{const s=(MATRIX[k][r]||'');return `<td style="font-size:.74rem">${s?s.split('').map(c=>ACTS[c]).join('، '):'<span class="muted">—</span>'}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>
+   <div class="bd"><div class="note"><b>ملاحظات:</b> المحكم يرى فقط المشاريع المسندة لمساره وغير المستبعد منها بسبب تعارض المصالح، وتقييماته فقط. «اعتماد» في الطلبات يعني قرار القبول/الرفض، وفي النتائج يعني اعتمادها قبل النشر. «إضافة» في النتائج تعني الاحتساب.</div></div></div>`;
+  const iso=`<div class="card"><div class="hd"><h2>كيف تُطبّق الصلاحيات</h2></div><div class="bd prose">
+   <ul><li>كل طلب يصل إلى الخادم (Cloudflare Worker) مع رمز جلسة موقّع، والخادم يتحقق من الدور ونطاق الهاكاثونات قبل أي قراءة أو تعديل.</li>
+   <li>الخادم يرسل لكل مستخدم بيانات الهاكاثونات التي في نطاقه فقط. المحكم يستلم مشاريعه المسندة وتقييماته فقط.</li>
+   <li>المحاولات المرفوضة تُسجّل في جدول Audit Log بنتيجة Denied.</li>
+   <li>مفتاح Airtable محفوظ في الخادم فقط، ولا يصل إلى المتصفح.</li></ul></div></div>`;
+  return `<div class="wrap">${head(t('الشركة'),t('المستخدمون والصلاحيات'),'حسابات فريق الشركة والمحكمين، ونطاق كل حساب من الهاكاثونات.',can('users','c')?btn('إضافة مستخدم','uedit',{id:''},'pri'):'')}
+  <div class="tabs" role="tablist">${[['list','المستخدمون'],['matrix','مصفوفة الصلاحيات'],['tests','آلية الحماية']].map(([k,l])=>`<button role="tab" class="${tab===k?'on':''}" data-a="tab" data-g="users" data-k="${k}">${l}</button>`).join('')}</div>
+  ${tab==='list'?table('users',cols,DB.users,{row:can('users','e')?'uedit':null,filters:[{key:'role',label:'الدور',get:u=>u.role,opts:Object.entries(ROLES)}]}):tab==='matrix'?matrix:iso}</div>`}
+function journeyHtml(j){return `<div class="list">${j.map(s=>`<div><span>${s.ok?'<span class="pill ok">نجح</span>':'<span class="pill bad">فشل</span>'} ${esc(s.name)}</span><span class="muted" style="font-size:.8rem;max-width:50%">${esc(s.msg||'')}</span></div>`).join('')}</div>`}
+function pg_audit(){if(!can('audit','v'))return denied();const rows=DB.audit.filter(l=>!l.hid||inScope(me(),l.hid));
+  const cols=[{key:'at',label:'التوقيت',text:l=>fmtDT(l.at),sortv:l=>l.at,html:l=>`<span class="num">${fmtDT(l.at)}</span>`},{key:'u',label:'المنفذ',text:l=>uname(l.userId)},{key:'h',label:'الهاكاثون',text:l=>l.hid?(H(l.hid)?.nameAr||'محذوف'):'الشركة'},
+   {key:'a',label:'الإجراء',text:l=>l.action,html:l=>l.action==='محاولة مرفوضة'?`<span class="pill bad">${esc(l.action)}</span>`:esc(l.action)},{key:'d',label:'التفاصيل',text:l=>l.detail}];
+  return `<div class="wrap">${head(t('الشركة'),t('سجل الأنشطة'),'كل إجراء مهم يُسجّل بالمنفذ والتوقيت، ومعه المحاولات المرفوضة بسبب الصلاحيات.',can('audit','x')?btn('تصدير','export',{k:'audit'}):'')}
+  ${table('audit',cols,rows,{filters:[{key:'h',label:'الهاكاثون',get:l=>l.hid||'',opts:visibleHackathons().map(h=>[h.id,h.nameAr])}]})}</div>`}
+
+/* ---------- analysis page ---------- */
+function pg_about(){return `<div class="wrap"><div class="card"><div class="bd prose">
+<div class="crumb">${t('الشركة')}</div><h1>فهم المنصة والخطة</h1>
+<div class="note ok">المنصة مربوطة بقاعدة Airtable «Participant Registration &amp; Management» عبر خادم Cloudflare Worker يطبّق تسجيل الدخول والصلاحيات وعزل الهاكاثونات. كل التعديلات تُحفظ في Airtable مباشرة.</div>
+<h2>1. ملخص فهمي للمنصة</h2>
+<p>منصة داخلية لفريق الشركة تدير عدة هاكاثونات من حساب مركزي. لكل هاكاثون بياناته المعزولة: الإعدادات، المسارات والتحديات، الطلبات، الفرق، المشاريع، التحكيم، النتائج، ومتابعة الحلول بعد الفعالية. المحكم يدخل بحساب محدود يرى فيه المشاريع المسندة إليه فقط. لا توجد بوابة مشاركين في هذه النسخة.</p>
+<h2>2. ما استخرجته من الصور (11 صورة)</h2>
+<ul>
+<li><b>القائمة الجانبية:</b> لوحة التحكم، دليل المستخدم، الفرز والقبول (المشاركون)، إعداد الهاكاثون (الهاكاثونات، المسارات، التحديات، الجهات المنظمة والشركاء، الأسئلة الشائعة، الأجندة)، الفرق (الفرق، سجل التحديات، جلسات التحكيم)، الإرشاد (طلبات الإرشاد، المرشدون، حجوزات الإرشاد، ملاحظات الإرشاد)، التسليمات، التحكيم (طلبات التحكيم، معايير التحكيم). الجزء الأسفل من القائمة مقصوص في الصورة.</li>
+<li><b>لوحة التحكم:</b> بطاقات: المشاركون، المقبولون، الفرق، التسليمات، تقدم التحكيم، تقييمات معلقة، حجوزات الإرشاد، شهادات صادرة. جدول «Judging Progress» بأعمدة: الاسم بالعربية والإنجليزية، مكتملة، مكتملة (عمود مكرر)، قيد التقييم، النسبة.</li>
+<li><b>المشاركون:</b> زر تصدير. مؤشرات: إجمالي التسجيلات، قيد المراجعة، مقبول، بدون فريق. أعمدة: الاسم بالعربية والإنجليزية، الجهة، نوع الجهة، التخصص، المسار المفضل، الأهلية، حالة التسجيل، حالة الفريق، تاريخ التسجيل. بحث وفلترة واختيار أعمدة.</li>
+<li><b>معايير التحكيم:</b> مجموع الأوزان، أعمدة: الرمز، الاسم (عربي)، الوزن، المقياس، مفعّل. تظهر المعايير على مستوى الهاكاثون لا المسار.</li>
+<li><b>النتائج:</b> الترتيب داخل المسار، المركز الفائز، الفريق، المسار، النتيجة النهائية، التقييمات المكتملة، الحالة، اعتماد مدير النظام، تاريخ النشر.</li>
+<li><b>التسليمات:</b> الرقم المرجعي، الفريق، المسار، الحالة، النسخة، قائمة التحقق، وقت التسليم، الموعد النهائي الفعلي.</li>
+<li><b>المستخدمون:</b> الاسم بالعربية والإنجليزية، البريد، الأدوار، المشارك، الفضاء الافتراضي، محظور، أُنشئ في. حوالي 19 صفحة، ما يعني أن المشاركين لهم حسابات في النظام الحالي.</li>
+<li><b>الإعدادات:</b> جدول مفتاح/قيمة بأنواع تقنية (integer, boolean, array): مقياس 1–10، قبول طلبات الانضمام للتحكيم والإرشاد، مدة جلسة الإرشاد 20 دقيقة، حد جلسات الإرشاد اليومية 2، فتح الحجز قبل 1440 دقيقة، إشعارات واتساب، ترتيب كسر التعادل (معيار الأثر المؤسسي ثم التنفيذ التقني ثم يدوي)، الموعد النهائي للتسليم، حجم الملف 20480 كيلوبايت، الامتدادات pdf/pptx/ppt، حجم الفريق 5–7، 15 فريقًا مؤكدًا كحد أقصى، موعدا تشكيل الفريق وتأكيده.</li>
+<li><b>إضافة هاكاثون:</b> النسخة، الاسم عربي/إنجليزي، وقت البداية والنهاية، المنطقة الزمنية، الحالة، مفتاح «الهاكاثون النشط»، الوصف.</li>
+<li><b>الشهادات:</b> معاينة التصاميم، إصدار شهادات المشاركة والفائزين ولمستخدم محدد. أعمدة: رمز التحقق، المستفيد، النوع، فئة التقدير، الفريق، الحالة، تاريخ الإصدار.</li>
+<li><b>لم أستطع قراءته:</b> كل الجداول في الصور فارغة، فلا توجد قيم حالات فعلية أو بيانات. لم تظهر شاشة تفاصيل طلب أو فريق أو تقييم، ولا قيم الحالات المتاحة.</li></ul>
+<h2>نقاط تحسين من الصور طبّقتها</h2>
+<ul><li>النظام الحالي يعتمد «هاكاثون نشط» واحدًا بمفتاح. استبدلته بمحدد هاكاثون دائم في الشريط العلوي مع لون واسم ظاهرين، ونطاق صلاحيات لكل مستخدم.</li>
+<li>الإعدادات معروضة كمفاتيح تقنية بأنواع بيانات. حوّلتها لنموذج مقسم بعناوين مفهومة وتحقق من القيم.</li>
+<li>فصلت الأهلية عن قرار القبول، وجعلت الانتقالات مقيدة ولها أثر (الانسحاب يزيل العضو من فريقه، القبول يتطلب الأهلية).</li>
+<li>عنوان «Judging Progress» غير مترجم والعمود «مكتملة» مكرر. استبدلته بمؤشر واضح: مطلوب/مسلَّم/مسودة.</li>
+<li>عرضت الوحدات صراحة في المؤشرات: «طلب» و«شخص» و«فريق».</li></ul>
+<h2>3. خريطة الشاشات والعلاقات</h2>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الكيان</th><th>يرتبط بـ</th><th>العلاقة</th><th>الشاشة</th></tr></thead><tbody>
+<tr><td>هاكاثون</td><td>كل ما يلي</td><td>كل سجل يحمل معرّف الهاكاثون؛ أساس العزل</td><td>الهاكاثونات، الإعدادات</td></tr>
+<tr><td>معيار تحكيم</td><td>هاكاثون</td><td>رمز ووزن ومفعّل؛ مجموع المفعّل = 100%</td><td>معايير التحكيم</td></tr>
+<tr><td>مسار</td><td>هاكاثون، معايير</td><td>أوزان خاصة اختيارية، مراكز وجوائز</td><td>المسارات والتحديات</td></tr>
+<tr><td>تحدٍ</td><td>مسار</td><td>عدة تحديات داخل المسار</td><td>المسارات والتحديات</td></tr>
+<tr><td>طلب تسجيل</td><td>هاكاثون، مسار مفضل، فريق</td><td>أهلية + قرار قبول + سجل حالات</td><td>المشاركون والطلبات</td></tr>
+<tr><td>فريق</td><td>مسار، تحدٍ، طلبات مقبولة</td><td>حجم ضمن الحدود، قائد، غرفة</td><td>الفرق</td></tr>
+<tr><td>مشروع</td><td>فريق (واحد لواحد)</td><td>دورة مراجعة، نسخ تسليم، متابعة حل</td><td>المشاريع والتسليمات، متابعة الحلول</td></tr>
+<tr><td>إسناد محكم</td><td>محكم، مسار</td><td>يحدد المشاريع التي يراها المحكم</td><td>المحكمون والجلسات</td></tr>
+<tr><td>تعارض مصالح</td><td>محكم، مشروع</td><td>عند اعتماده يُستبعد المحكم من المشروع</td><td>المحكمون والجلسات</td></tr>
+<tr><td>جلسة</td><td>محكمون، مشاريع، قاعة</td><td>تُكشف التعارضات قبل الحفظ</td><td>المحكمون والجلسات</td></tr>
+<tr><td>تقييم</td><td>محكم، مشروع</td><td>مسودة ← مسلَّم؛ إعادة الفتح موثّقة</td><td>تقييماتي (المحكم)</td></tr>
+<tr><td>نتائج</td><td>هاكاثون</td><td>احتساب ← اعتماد ← نشر، وتعديلات موثّقة</td><td>النتائج والاعتماد</td></tr>
+</tbody></table></div>
+<h2>4. رحلة العمل</h2>
+<ul><li>إنشاء الهاكاثون كمسودة ← ضبط الإعدادات والمعايير ← إضافة المسارات والتحديات ← النشر.</li>
+<li>استقبال الطلبات ← مراجعة الأهلية ← قرار القبول ← إسناد المقبولين لفرق.</li>
+<li>إنشاء مشروع الفريق ← تسجيل نسخ التسليم ← مراجعة ← «مؤهلة للتحكيم».</li>
+<li>إسناد المحكمين للمسارات ← معالجة الإفصاح عن التعارض ← جدولة الجلسات مع كشف التعارض ← تقييم المحكم (مسودة ثم تسليم نهائي).</li>
+<li>احتساب النتائج ← مراجعة الناقص والتعادل ← اعتماد ← نشر الحقول المسموحة فقط ← متابعة الحلول المتبناة.</li></ul>
+<h2>طريقة الاحتساب</h2>
+<p>درجة المحكم للمشروع = مجموع (الدرجة ÷ الحد الأقصى للمقياس × وزن المعيار)، والنتيجة من 100. نتيجة المشروع = متوسط درجات المحكمين المطلوبين الذين سلّموا نهائيًا. المحكم المستبعد بتعارض مصالح لا يُحتسب ضمن المطلوبين. إذا كانت السياسة «منع الاعتماد» يُستبعد المشروع الناقص من الترتيب ويُمنع الاعتماد حتى يكتمل.</p>
+<h2>5. افتراضات ونقاط تحتاج تأكيدًا</h2>
+<ul><li>المعايير في الصور على مستوى الهاكاثون، والمتطلبات تطلبها لكل مسار. جعلتها على مستوى الهاكاثون مع خيار أوزان خاصة لكل مسار. <b>هل هذا مناسب؟</b></li>
+<li>النظام الحالي فيه حسابات مشاركين و«فضاء افتراضي». <b>هل تُنقل بوابة المشاركين للنسخة الأولى أم تبقى في النظام الحالي؟</b></li>
+<li>الإرشاد والشهادات موجودة في النظام الحالي وغير مذكورة في المتطلبات. وضعتها في «لاحقًا». <b>هل هي ضمن النطاق؟</b></li>
+<li>حالات الطلبات المستخدمة مقترحة لأن الجداول في الصور فارغة.</li>
+<li>الإفصاح عن تعارض المصالح: المحكم أو مسؤول التحكيم يسجله، ومسؤول التحكيم يعتمد الاستبعاد. <b>توصية تحتاج اعتمادًا.</b></li>
+<li>«اعتماد مدير النظام» في جدول النتائج: جعلت الاعتماد متاحًا لمدير النظام ومدير الهاكاثون. <b>هل يقتصر على مدير النظام؟</b></li>
+<li>لا يوجد تكامل مع الموقع العام أو نموذج التسجيل قبل فحص واجهاتهما.</li></ul>
+<h2>ما لم يُنفذ في هذه النسخة</h2>
+<ul><li>رفع الشعار وملفات التسليم إلى Airtable من داخل المنصة (الحقول موجودة، والرفع لم يُربط بعد).</li><li>النسخ الاحتياطي الدوري: يعتمد حاليًا على Snapshots في Airtable.</li><li>الأجندة، الجهات والشركاء، الأسئلة الشائعة، الإرشاد، الشهادات، الملفات والتقارير المتقدمة.</li><li>رفع الملفات الفعلي للتسليمات، والنشر الفعلي للواجهة العامة (تظهر معاينة للحقول المسموحة فقط).</li><li>التنزيل المباشر لملفات Excel (التصدير الآن نص CSV للنسخ).</li><li>الترجمة الكاملة للمحتوى: التبديل للإنجليزية يغيّر الاتجاه وعناوين القوائم فقط.</li></ul>
+<h2>قائمة التطوير اللاحقة</h2>
+<ul><li>التدريب والمحاكاة.</li><li>مساعد ذكاء اصطناعي لتلخيص الأفكار أو دعم التحكيم.</li><li>إشعارات خارجية (بريد/واتساب) بعد الموافقة على الخدمة وبيانات الدخول.</li></ul>
+</div></div></div>`}
+
+/* =========================================================
+   Pages — hackathon level
+   ========================================================= */
+function needH(){const h=H(UI.hid);if(!h)return {err:`<div class="wrap"><div class="card">${empty('لم يتم اختيار هاكاثون','اختر هاكاثونًا من الشريط العلوي أو من قائمة الهاكاثونات.')}</div></div>`};
+  try{guardScope(h.id)}catch(e){return {err:denied(e.message)}}return {h}}
+const hc=(h,label)=>`${esc(h.nameAr)} › ${t(label)}`;
+function pg_overview(){const {h,err}=needH();if(err)return err;const apps=appsOf(h.id),acc=apps.filter(a=>a.decision==='accepted'),teams=teamsOf(h.id),projs=projectsOf(h.id);
+  const una=acc.filter(a=>!a.teamId);const ev=evalProgress(h.id);const canA=can('application','v',h.id);
+  const dc=Object.keys(DEC).map(k=>[k,apps.filter(a=>a.decision===k).length]);const col={pending:'info',accepted:'ok',waitlist:'warn',rejected:'bad',withdrawn:'neutral'};
+  const pend=apps.filter(a=>a.decision==='pending').sort((a,b)=>a.createdAt<b.createdAt?-1:1);
+  const ses=DB.sessions.filter(s=>s.hid===h.id).sort((a,b)=>a.start<b.start?-1:1);
+  const incomplete=projs.filter(p=>['eligible','evaluated'].includes(p.status)).map(p=>({p,s:projectScore(p)})).filter(x=>!x.s.complete);
+  const coiP=DB.coi.filter(c=>c.hid===h.id&&c.status==='pending');const badTeams=teams.filter(tm=>!teamCheck(tm).ok);
+  const actions=[[apps.filter(a=>a.eligibility==='needs_info').length,'طلبات تنتظر استكمال المتقدم','apps'],[coiP.length,'إفصاحات تعارض مصالح تنتظر الاعتماد','judging'],[projs.filter(p=>['submitted','under_review','resubmitted'].includes(p.status)).length,'مشاريع تنتظر المراجعة','projects'],[badTeams.length,'فرق غير مكتملة','teams'],[h.results.state==='calculated'?1:0,'نتائج تنتظر الاعتماد','results'],[h.results.stale?1:0,'نتائج تحتاج إعادة احتساب بعد تغير التقييمات','results']].filter(x=>x[0]);
+  return `<div class="wrap">${head(hc(h,'نظرة عامة'),h.nameAr,`${MODE[h.mode]} · ${phase(h)} · الفعالية ${fmtD(h.eventStart)} → ${fmtD(h.eventEnd)}`)}
+  <div class="kpis">${canA?kpi('طلبات التسجيل',apps.length,'طلب','info',`${pend.length} قيد المراجعة`,'apps')+kpi('المشاركون المقبولون',acc.length,'شخص','ok',`${una.length} بدون فريق`,'teams'):''}${kpi('الفرق',teams.length,'فريق','purple',`${badTeams.length} غير مكتمل`,'teams')}${kpi('المشاريع',projs.length,'مشروع','neutral',`${projs.filter(p=>p.status==='eligible').length} مؤهلة للتحكيم`,'projects')}${kpi('التقييمات المسلّمة',`${ev.done}/${ev.req}`,'تقييم','accent',`${ev.draft} مسودة`,'judging')}</div>
+  <div class="grid g2">
+   ${canA?`<div class="card"><div class="hd"><h2>الطلبات حسب قرار القبول</h2><span class="muted num">${apps.length} طلب</span></div><div class="bd"><div class="stack">${dc.filter(x=>x[1]).map(([k,n])=>`<span style="width:${n/apps.length*100}%;background:var(--${col[k]})" title="${DEC[k][0]}: ${n}"></span>`).join('')}</div>
+    <div class="legend">${dc.map(([k,n])=>`<span><i style="background:var(--${col[k]})"></i>${DEC[k][0]} <b class="num">${n}</b></span>`).join('')}</div>
+    <div class="legend">${Object.keys(ELIG).map(k=>`<span>${ELIG[k][0]} <b class="num">${apps.filter(a=>a.eligibility===k).length}</b></span>`).join('')}</div></div></div>`:''}
+   <div class="card"><div class="hd"><h2>الإجراءات المعلقة</h2></div><div class="bd"><div class="list">${actions.length?actions.map(([n,l,p])=>`<button data-a="go" data-p="${p}"><span>${esc(l)}</span><span class="pill warn num">${n}</span></button>`).join(''):'<div class="muted">لا توجد إجراءات معلقة.</div>'}</div></div></div>
+  </div>
+  <div class="card"><div class="hd"><h2>التوزيع على المسارات</h2></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>المسار</th><th>طلبات فضّلته</th><th>مشاركون في فرقه</th><th>فرق</th><th>مشاريع</th><th>محكمون</th></tr></thead><tbody>
+   ${tracksOf(h.id).map(tr=>{const tt=teams.filter(x=>x.trackId===tr.id);return `<tr><td>${trackTag(tr.id)}</td><td class="n">${apps.filter(a=>a.trackId===tr.id).length}</td><td class="n">${tt.reduce((s,x)=>s+membersOf(x.id).length,0)}</td><td class="n">${tt.length}</td><td class="n">${projs.filter(p=>p.trackId===tr.id).length}</td><td class="n">${DB.judgeTracks.filter(j=>j.trackId===tr.id).length}</td></tr>`}).join('')||`<tr><td colspan="6">${empty('لا توجد مسارات','أضف مسارًا من صفحة المسارات والتحديات.')}</td></tr>`}</tbody></table></div></div>
+  <div class="grid g3">
+   ${canA?`<div class="card"><div class="hd"><h2>تنتظر المراجعة</h2>${btn('الكل','go',{p:'apps'},'sm')}</div><div class="bd"><div class="list">${pend.slice(0,6).map(a=>`<button data-a="openapp" data-id="${a.id}"><span>${esc(a.name)}</span>${pill(ELIG,a.eligibility)}</button>`).join('')||'<div class="muted">لا توجد طلبات معلقة.</div>'}</div></div></div>`:''}
+   <div class="card"><div class="hd"><h2>جلسات التحكيم</h2>${can('judging','v',h.id)?btn('الجدول','gotab',{p:'judging',g:'judging',k:'sessions'},'sm'):''}</div><div class="bd"><div class="list">${ses.slice(0,5).map(s=>`<div><span>${esc(s.title)}<br><small class="muted">${esc(s.room)} · ${s.projectIds.length} مشاريع</small></span><span class="num" style="font-size:.8rem">${fmtDT(s.start)}</span></div>`).join('')||'<div class="muted">لا توجد جلسات مجدولة.</div>'}</div></div></div>
+   <div class="card"><div class="hd"><h2>تقييمات غير مكتملة</h2></div><div class="bd"><div class="list">${incomplete.map(({p,s})=>`<div><span>${esc(p.title)}</span><span class="num">${s.evs.length}/${s.req.length}</span></div>`).join('')||'<div class="muted">كل التقييمات المطلوبة مكتملة.</div>'}</div>
+    ${canA&&una.length?`<div class="note warn" style="margin-top:10px"><b class="num">${una.length}</b> مشاركين مقبولين بدون فريق. ${btn('إسنادهم','go',{p:'teams'},'sm')}</div>`:''}</div></div>
+  </div></div>`}
+function pg_settings(){const {h,err}=needH();if(err)return err;const ed=can('hackathon','e',h.id)&&h.status!=='archived';
+  return `<div class="wrap">${head(hc(h,'الإعدادات'),'إعدادات الهاكاثون',ed?'الحفظ لا ينشر المحتوى. استخدم «نشر» بعد المعاينة.':(h.status==='archived'?'الهاكاثون مؤرشف — للقراءة فقط.':'لديك صلاحية المشاهدة فقط.'))}
+  ${h.status==='archived'?'<div class="note warn">الهاكاثون مؤرشف. استعده من صفحة الهاكاثونات للتعديل.</div>':''}
+  <div class="card"><div class="bd" ${ed?'':'inert'} style="${ed?'':'opacity:.75'}">${hForm(h)}</div></div></div>`}
+function pg_tracks(){const {h,err}=needH();if(err)return err;const trs=tracksOf(h.id);const ce=can('track','e',h.id);
+  return `<div class="wrap">${head(hc(h,'المسارات والتحديات'),'المسارات والتحديات','المسار هو المجال العام ويحدد المراكز والجوائز والمحكمين. التحدي مشكلة محددة داخل المسار ويختارها الفريق.',can('track','c',h.id)?btn('إضافة مسار','tedit',{id:''},'pri'):'')}
+  <div class="grid g3">${trs.map((tr,i)=>{const chs=DB.challenges.filter(c=>c.trackId===tr.id);const crit=critOf(tr.id);return `<div class="card hcard"><span class="lane" style="background:${esc(tr.color)}"></span>
+   <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div style="display:flex;gap:8px;align-items:center;color:${esc(tr.color)}">${ic(tr.icon,22)}<div style="color:var(--fg)"><h2>${esc(tr.nameAr)}</h2><div class="muted" style="font-size:.78rem" dir="ltr">${esc(tr.nameEn||'')}</div></div></div><span class="tag num">#${tr.order}</span></div>
+   <p class="muted" style="margin:0;font-size:.85rem">${esc(tr.descAr||'—')}</p>
+   <div style="font-size:.84rem"><b>التحديات (${chs.length})</b><ul style="margin:4px 0 0;padding-inline-start:18px">${chs.map(c=>`<li>${esc(c.title)}</li>`).join('')||'<li class="muted">لا توجد تحديات</li>'}</ul></div>
+   <div style="font-size:.84rem"><b>المراكز والجوائز</b>: ${tr.winners?tr.prizes.slice(0,tr.winners).map((p,i)=>`<span class="tag">${i+1}: ${esc(p||'—')}</span>`).join(' '):'لا مراكز'}</div>
+   <div style="font-size:.84rem"><b>الأوزان</b> ${tr.weights?'<span class="pill info">خاصة بالمسار</span>':'<span class="pill neutral">أوزان الهاكاثون</span>'}<div class="muted">${crit.map(c=>`${esc(c.nameAr)} ${c.weight}%`).join(' · ')}</div></div>
+   <div class="muted" style="font-size:.8rem">${teamsOf(h.id).filter(x=>x.trackId===tr.id).length} فرق · ${projectsOf(h.id).filter(x=>x.trackId===tr.id).length} مشاريع · ${DB.judgeTracks.filter(j=>j.trackId===tr.id).length} محكمين</div>
+   ${ce?`<div class="acts">${btn('تعديل','tedit',{id:tr.id},'sm')}${btn('↑','tmove',{id:tr.id,d:-1},'sm',i===0)}${btn('↓','tmove',{id:tr.id,d:1},'sm',i===trs.length-1)}${can('track','d',h.id)?btn('حذف','tdel',{id:tr.id},'sm danger'):''}</div>`:''}</div>`}).join('')||`<div class="card">${empty('لا توجد مسارات بعد','أضف أول مسار لتبدأ استقبال الطلبات وتنظيم الفرق.')}</div>`}</div></div>`}
+function pg_criteria(){const {h,err}=needH();if(err)return err;const ed=can('criteria','e',h.id)&&!hasEvals(h.id)&&h.status!=='archived';const s=sum(h.criteria.filter(c=>c.enabled).map(c=>c.weight));
+  return `<div class="wrap">${head(hc(h,'معايير التحكيم'),'معايير التحكيم','معايير الهاكاثون وأوزانها الافتراضية. يمكن لكل مسار استخدام أوزان خاصة من صفحة المسارات.')}
+  ${hasEvals(h.id)?'<div class="note warn">بدأ تسليم التقييمات النهائية، لذلك المعايير مقفلة لحماية الاحتساب.</div>':''}
+  <div class="card"><div class="hd"><div><h2>مجموع الأوزان المفعّلة: <span id="cSum" class="sum ${s===100?'ok':'bad'}">${s}%</span></h2><div class="muted" style="font-size:.82rem">المقياس: <span class="num">${h.scoreMin}–${h.scoreMax}</span> · الرمز يُستخدم في ترتيب كسر التعادل.</div></div></div>
+  <form data-form="csave" ${ed?'':'inert'}><div class="tbl-wrap"><table class="tbl"><thead><tr><th>الرمز</th><th>الاسم (عربي)</th><th>الوزن %</th><th>المقياس</th><th>مفعّل</th><th></th></tr></thead><tbody id="cRows">
+  ${h.criteria.map((c,i)=>critRow(c,i,h)).join('')}</tbody></table></div>
+  <div class="bd"><div class="err" id="cErr" role="alert"></div>${ed?`<div class="acts">${btn('إضافة معيار','cadd',{})}${btn('حفظ المعايير','csubmit',{},'pri')}</div>`:''}</div></form></div></div>`}
+const critRow=(c,i,h)=>`<tr data-crow><td><input aria-label="الرمز" name="code" dir="ltr" value="${esc(c.code)}" style="width:140px" class="mono" data-in="csum"><input type="hidden" name="cid" value="${esc(c.id||'')}"></td><td><input aria-label="الاسم" name="cname" value="${esc(c.nameAr)}" style="width:100%;min-width:140px"></td><td><input aria-label="الوزن" name="w" type="number" min="0" max="100" value="${+c.weight||0}" style="width:80px" class="num" data-in="csum"></td><td class="num muted">${h.scoreMin}–${h.scoreMax}</td><td><input aria-label="مفعّل" type="checkbox" name="en" ${c.enabled?'checked':''} data-ch="csum"></td><td><button type="button" class="btn sm danger" data-a="crem">حذف</button></td></tr>`;
+
+/* ---------- applications ---------- */
+function pg_apps(){const {h,err}=needH();if(err)return err;if(!can('application','v',h.id))return denied();const apps=appsOf(h.id);
+  const cols=[{key:'name',label:'الاسم الكامل بالعربية',text:a=>a.name,html:a=>`<b>${esc(a.name)}</b>`,fixed:1},{key:'en',label:'الاسم بالإنجليزية',text:a=>a.nameEn},{key:'org',label:'الجهة',text:a=>a.org},{key:'ot',label:'نوع الجهة',text:a=>a.orgType},
+   {key:'sp',label:'التخصص',text:a=>a.specialty},{key:'reg',label:'المنطقة',text:a=>a.region},{key:'rt',label:'نوع التسجيل',text:a=>a.regType==='team'?'ضمن فريق':'فردي'},{key:'tr',label:'المسار المفضل',text:a=>T(a.trackId)?.nameAr||'',html:a=>trackTag(a.trackId)},
+   {key:'el',label:'الأهلية',text:a=>ELIG[a.eligibility][0],html:a=>pill(ELIG,a.eligibility)},{key:'dc',label:'قرار القبول',text:a=>DEC[a.decision][0],html:a=>pill(DEC,a.decision)},
+   {key:'tm',label:'حالة الفريق',text:a=>a.teamId?TM(a.teamId).name:(a.decision==='accepted'?'بدون فريق':'—'),html:a=>a.teamId?esc(TM(a.teamId).name):(a.decision==='accepted'?'<span class="pill warn">بدون فريق</span>':'<span class="muted">—</span>')},
+   {key:'at',label:'تاريخ التسجيل',text:a=>fmtDT(a.createdAt),sortv:a=>a.createdAt,html:a=>`<span class="num">${fmtDT(a.createdAt)}</span>`}];
+  const cA=can('application','a',h.id),cE=can('application','e',h.id);
+  const bulk=ids=>`${cE?btn('مؤهل','bulk',{op:'elig_eligible'},'sm'):''}${cE?btn('يحتاج استكمالًا','bulk',{op:'elig_needs_info'},'sm'):''}${cA?btn('قبول','bulk',{op:'dec_accepted'},'sm pri'):''}${cA?btn('قائمة انتظار','bulk',{op:'dec_waitlist'},'sm'):''}${cA?btn('رفض','bulk',{op:'dec_rejected'},'sm danger'):''}`;
+  return `<div class="wrap">${head(hc(h,'المشاركون والطلبات'),'المشاركون والطلبات','الأهلية تقيّم استيفاء الشروط، وقرار القبول يحدد المشاركة. لا يُقبل طلب قبل اعتماد أهليته.',
+   `${can('application','x',h.id)?btn('تصدير','export',{k:'apps'}):''}${can('application','c',h.id)?btn('إدخال طلب يدويًا','newapp',{},'pri'):''}`)}
+  <div class="kpis">${kpi('إجمالي التسجيلات',apps.length,'طلب','info')}${kpi('قيد المراجعة',apps.filter(a=>a.decision==='pending').length,'طلب','warn')}${kpi('مقبول',apps.filter(a=>a.decision==='accepted').length,'شخص','ok')}${kpi('بدون فريق',apps.filter(a=>a.decision==='accepted'&&!a.teamId).length,'شخص','bad',null,'teams')}</div>
+  <div class="note">مصدر الطلبات في هذه النسخة: بيانات تجريبية وإدخال يدوي. ربط نموذج التسجيل العام بقاعدة البيانات لم يُنفذ بعد.</div>
+  ${table('apps',cols,apps,{select:cE||cA,bulk,row:'openapp',hidden:['en','ot','reg','rt'],sort:'at',dir:-1,
+    filters:[{key:'el',label:'الأهلية',get:a=>a.eligibility,opts:Object.entries(ELIG).map(([k,v])=>[k,v[0]])},{key:'dc',label:'القرار',get:a=>a.decision,opts:Object.entries(DEC).map(([k,v])=>[k,v[0]])},{key:'tr',label:'المسار',get:a=>a.trackId||'',opts:tracksOf(h.id).map(x=>[x.id,x.nameAr])},{key:'rt',label:'نوع التسجيل',get:a=>a.regType,opts:[['individual','فردي'],['team','ضمن فريق']]}]})}</div>`}
+function appDrawer(a){const h=H(a.hid);const cE=can('application','e',a.hid),cA=can('application','a',a.hid);const ed=UI.drawer.edit;
+  const eT=(ELIG_T[a.eligibility]||[]),dT=(DEC_T[a.decision]||[]);
+  const info=ed?`<form class="form" data-form="appsave" data-id="${a.id}" data-v="${a.v}"><div class="fgrid">${[['name','الاسم بالعربية'],['nameEn','الاسم بالإنجليزية'],['email','البريد'],['phone','الجوال'],['org','الجهة'],['orgType','نوع الجهة'],['region','المنطقة'],['age','الفئة العمرية'],['specialty','التخصص'],['experience','الخلفية المهنية']].map(([k,l])=>`<label class="field"><span>${l}</span><input id="ae-${k}" name="${k}" value="${esc(a[k])}"></label>`).join('')}
+    <label class="field"><span>المسار المفضل</span><select id="ae-tr" name="trackId"><option value="">—</option>${tracksOf(a.hid).map(x=>`<option value="${x.id}" ${x.id===a.trackId?'selected':''}>${esc(x.nameAr)}</option>`).join('')}</select></label>
+    <label class="field"><span>نوع التسجيل</span><select id="ae-rt" name="regType"><option value="individual" ${a.regType==='individual'?'selected':''}>فردي</option><option value="team" ${a.regType==='team'?'selected':''}>ضمن فريق</option></select></label></div>
+    <div class="acts">${btn('حفظ','appsubmit',{},'pri')}${btn('إلغاء','appedit',{on:''})}</div></form>`
+   :`<dl class="kv"><dt>البريد</dt><dd class="mono" dir="ltr" style="text-align:start">${esc(a.email)}</dd><dt>الجوال</dt><dd class="num">${esc(a.phone)}</dd><dt>الجهة</dt><dd>${esc(a.org)} <span class="tag">${esc(a.orgType)}</span></dd><dt>المنطقة</dt><dd>${esc(a.region)}</dd><dt>الفئة العمرية</dt><dd class="num">${esc(a.age)}</dd><dt>التخصص</dt><dd>${esc(a.specialty)}</dd><dt>الخلفية المهنية</dt><dd>${esc(a.experience)}</dd><dt>نوع التسجيل</dt><dd>${a.regType==='team'?'ضمن فريق':'فردي'}${a.teamNameReq?` — ${esc(a.teamNameReq)}`:''}</dd><dt>المسار المفضل</dt><dd>${trackTag(a.trackId)}</dd><dt>تاريخ التسجيل</dt><dd class="num">${fmtDT(a.createdAt)}</dd><dt>المرفقات</dt><dd>${a.files.length?a.files.map(f=>`<span class="tag">${esc(f)}</span>`).join(' '):'<span class="muted">لا يوجد</span>'}</dd></dl>`;
+  return `<div class="dh"><div><div class="crumb">${esc(h.nameAr)} › طلب تسجيل</div><h2>${esc(a.name)}</h2><div class="acts" style="margin-top:6px">${pill(ELIG,a.eligibility)} ${pill(DEC,a.decision)} ${a.teamId?`<span class="tag">${esc(TM(a.teamId).name)}</span>`:''}</div></div><button class="btn sm" data-a="close" aria-label="إغلاق">إغلاق</button></div>
+  <div class="db">
+   <div class="card"><div class="hd"><h3>بيانات المتقدم</h3>${cE&&!ed?btn('تعديل البيانات','appedit',{on:'1'},'sm'):''}</div><div class="bd">${info}</div></div>
+   <div class="card"><div class="hd"><h3>إجابات النموذج</h3></div><div class="bd"><dl class="kv">${Object.entries(a.answers).map(([q,v])=>`<dt>${esc(q)}</dt><dd>${esc(v)}</dd>`).join('')||'<dd class="muted">لا توجد إجابات</dd>'}</dl></div></div>
+   ${cE||cA?`<div class="card"><div class="hd"><h3>المراجعة والقرار</h3></div><div class="bd" style="display:grid;gap:12px">
+    <label class="field"><span>السبب / الملاحظة المرفقة بالقرار</span><textarea id="decReason" placeholder="مطلوب عند: غير مؤهل، طلب استكمال، الرفض، الانسحاب، إعادة الفتح"></textarea></label>
+    <div><div class="muted" style="font-size:.8rem;margin-bottom:6px">1) الأهلية — الحالية: ${ELIG[a.eligibility][0]}</div><div class="acts">${cE?eT.map(k=>btn(ELIG_VERB[k],'elig',{id:a.id,to:k},'sm'+(k==='eligible'?' pri':''))).join(''):''}</div></div>
+    <div><div class="muted" style="font-size:.8rem;margin-bottom:6px">2) قرار القبول — الحالي: ${DEC[a.decision][0]}${a.eligibility!=='eligible'&&['pending','waitlist'].includes(a.decision)?' · يتطلب «مؤهل» للقبول':''}</div><div class="acts">${dT.map(k=>{const need=['accepted','rejected','waitlist'].includes(k)?cA:cE;return need?btn(DEC_VERB[k],'dec',{id:a.id,to:k},'sm'+(k==='accepted'?' pri':k==='rejected'?' danger':''),['accepted','waitlist'].includes(k)&&a.eligibility!=='eligible'):''}).join('')}</div></div>
+    ${a.decision==='accepted'&&can('team','e',a.hid)?`<div><div class="muted" style="font-size:.8rem;margin-bottom:6px">3) الفريق</div><div class="acts"><label class="sr" for="asgTeam">الفريق</label><select id="asgTeam"><option value="">اختر فريقًا…</option>${teamsOf(a.hid).filter(x=>x.id!==a.teamId).map(x=>`<option value="${x.id}">${esc(x.name)} (${membersOf(x.id).length}/${h.teamMax}) — ${esc(T(x.trackId)?.nameAr||'')}</option>`).join('')}</select>${btn(a.teamId?'نقل':'إسناد','assignsel',{id:a.id},'sm pri')}${a.teamId?btn('إزالة من الفريق','unassign',{id:a.id},'sm'):''}</div></div>`:''}
+   </div></div>`:''}
+   <div class="card"><div class="hd"><h3>ملاحظات المراجعين</h3></div><div class="bd" style="display:grid;gap:10px">${a.notes.map(n=>`<div style="font-size:.86rem"><b>${esc(uname(n.by))}</b> <small class="muted num">${fmtDT(n.at)}</small><div>${esc(n.text)}</div></div>`).join('')||'<span class="muted">لا توجد ملاحظات.</span>'}
+    ${cE?`<form data-form="note" data-id="${a.id}" class="acts"><label class="sr" for="noteTxt">ملاحظة</label><input id="noteTxt" name="text" placeholder="أضف ملاحظة داخلية…" style="flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:6px 9px;background:var(--surface)">${btn('إضافة','notesubmit',{},'sm')}</form>`:''}</div></div>
+   <div class="card"><div class="hd"><h3>سجل تغيير الحالة</h3></div><div class="bd"><div class="tl">${[...a.history].reverse().map(x=>`<div>${esc(x.text)}<br><small class="num">${fmtDT(x.at)} · ${esc(uname(x.by))}</small></div>`).join('')}</div></div></div>
+  </div>`}
+function newAppDrawer(h){return `<div class="dh"><div><div class="crumb">${esc(h.nameAr)}</div><h2>إدخال طلب يدويًا</h2></div><button class="btn sm" data-a="close">إغلاق</button></div>
+  <div class="db"><div class="note">يستخدم عندما يصل الطلب خارج النموذج. يبدأ الطلب بحالة «لم تُراجع» و«قيد المراجعة».</div>
+  <form class="form" data-form="newapp"><div class="fgrid">
+   <label class="field"><span>الاسم بالعربية <em>*</em></span><input id="na-name" name="name" required></label><label class="field"><span>الاسم بالإنجليزية</span><input id="na-en" name="nameEn" dir="ltr"></label>
+   <label class="field"><span>البريد <em>*</em></span><input id="na-email" name="email" type="email" dir="ltr" required></label><label class="field"><span>الجوال</span><input id="na-phone" name="phone" dir="ltr"></label>
+   <label class="field"><span>الجهة</span><input id="na-org" name="org"></label><label class="field"><span>المنطقة</span><input id="na-reg" name="region"></label>
+   <label class="field"><span>التخصص</span><input id="na-sp" name="specialty"></label><label class="field"><span>الفئة العمرية</span><select id="na-age" name="age">${['18–24','25–34','35–44','45+'].map(x=>`<option>${x}</option>`).join('')}</select></label>
+   <label class="field"><span>نوع التسجيل</span><select id="na-rt" name="regType">${h.allowIndividual?'<option value="individual">فردي</option>':''}${h.allowTeam?'<option value="team">ضمن فريق</option>':''}</select></label>
+   <label class="field"><span>المسار المفضل</span><select id="na-tr" name="trackId"><option value="">—</option>${tracksOf(h.id).map(x=>`<option value="${x.id}">${esc(x.nameAr)}</option>`).join('')}</select></label>
+  </div><div class="err" id="naErr"></div><div class="acts">${btn('حفظ الطلب','newappsubmit',{},'pri')}</div></form></div>`}
+
+/* ---------- teams ---------- */
+function pg_teams(){const {h,err}=needH();if(err)return err;if(!can('team','v',h.id))return denied();const teams=teamsOf(h.id);const una=appsOf(h.id).filter(a=>a.decision==='accepted'&&!a.teamId);const cE=can('team','e',h.id);
+  return `<div class="wrap">${head(hc(h,'الفرق'),'الفرق',`حجم الفريق المسموح: <span class="num">${h.teamMin}–${h.teamMax}</span> · الحد الأقصى للفرق: <span class="num">${h.maxTeams}</span> · آخر موعد للتشكيل: <span class="num">${fmtDT(h.formationDeadline)}</span>`,
+   `${can('team','x',h.id)?btn('تصدير','export',{k:'teams'}):''}${can('team','c',h.id)?btn('إنشاء فريق','teamedit',{id:''},'pri'):''}`)}
+  ${can('application','v',h.id)||cE?`<div class="card"><div class="hd"><h2>مقبولون بدون فريق <span class="num">(${una.length})</span></h2></div><div class="bd">${una.length?`<div class="list">${una.map(a=>`<div><span><b>${esc(a.name)}</b> <small class="muted">${esc(a.specialty)} · يفضّل ${esc(T(a.trackId)?.nameAr||'—')}</small></span>${cE?`<span class="acts"><label class="sr" for="u-${a.id}">الفريق</label><select id="u-${a.id}" data-ch="quickassign" data-id="${a.id}"><option value="">إسناد إلى…</option>${teams.map(x=>`<option value="${x.id}" ${membersOf(x.id).length>=h.teamMax?'disabled':''}>${esc(x.name)} (${membersOf(x.id).length}/${h.teamMax})</option>`).join('')}</select></span>`:''}</div>`).join('')}</div>`:'<span class="muted">كل المقبولين مسندون إلى فرق.</span>'}</div></div>`:''}
+  <div class="grid g2">${teams.map(tm=>{const c=teamCheck(tm);const m=membersOf(tm.id);const p=projOfTeam(tm.id);const ch=DB.challenges.find(x=>x.id===tm.challengeId);
+   return `<div class="card hcard"><span class="lane" style="background:${esc(T(tm.trackId)?.color||'var(--line)')}"></span>
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div><h2>${esc(tm.name)}</h2><div style="font-size:.82rem">${trackTag(tm.trackId)} ${ch?`<span class="muted">· ${esc(ch.title)}</span>`:''}</div></div><div class="acts">${c.ok?'<span class="pill ok">مكتمل</span>':'<span class="pill warn">غير مكتمل</span>'}<span class="tag num">${c.count}/${h.teamMax}</span></div></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${m.map(a=>`<span class="chip ${tm.leaderId===a.id?'lead':''}">${tm.leaderId===a.id?ic('star',13):''}${esc(a.name)}${cE?`${tm.leaderId!==a.id?`<button data-a="leader" data-t="${tm.id}" data-id="${a.id}" title="تعيين قائدًا" aria-label="تعيين ${esc(a.name)} قائدًا">${ic('star',12)}</button>`:''}<button data-a="unassign" data-id="${a.id}" title="إزالة" aria-label="إزالة ${esc(a.name)}">✕</button>`:''}</span>`).join('')||'<span class="muted">لا يوجد أعضاء</span>'}</div>
+    ${c.miss.length?`<div style="font-size:.8rem;color:var(--warn)">${c.miss.map(esc).join(' · ')}</div>`:''}
+    <div style="font-size:.82rem;display:grid;gap:2px"><span>المشروع: ${p?`<button class="lnk" data-a="openproj" data-id="${p.id}">${esc(p.title)}</button> ${pill(PROJ,p.status)}`:'<span class="muted">لا يوجد</span>'}</span>
+     <span>الغرفة: ${tm.room?`<a href="${esc(tm.room)}" target="_blank" rel="noopener">${esc(tm.room)}</a>`:'<span class="muted">لم تُضف</span>'} <span class="tag">${tm.roomVis==='team_judges'?'يراها الفريق والمحكمون':'الإدارة فقط'}</span></span>
+     <span>الجلسات: ${DB.sessions.filter(s=>p&&s.projectIds.includes(p.id)).map(s=>`<span class="tag num">${fmtDT(s.start)}</span>`).join(' ')||'<span class="muted">لا توجد</span>'}</span></div>
+    ${cE?`<div class="acts">${btn('تعديل','teamedit',{id:tm.id},'sm')}${can('team','d',h.id)?btn('حذف','teamdel',{id:tm.id},'sm danger'):''}</div>`:''}</div>`}).join('')||`<div class="card">${empty('لا توجد فرق بعد','أنشئ فريقًا ثم أسند المقبولين إليه.')}</div>`}</div></div>`}
+function teamDrawer(h,tm){const trs=tracksOf(h.id);const cur=tm?.trackId||trs[0]?.id;
+  return `<div class="dh"><div><div class="crumb">${esc(h.nameAr)} › الفرق</div><h2>${tm?'تعديل فريق':'إنشاء فريق'}</h2></div><button class="btn sm" data-a="close">إغلاق</button></div>
+  <div class="db"><form class="form" data-form="teamsave" data-id="${tm?.id||''}"><div class="fgrid">
+   <label class="field full"><span>اسم الفريق <em>*</em></span><input id="te-name" name="name" value="${esc(tm?.name||'')}"></label>
+   <label class="field"><span>المسار</span><select id="te-track" name="trackId" data-ch="teamtrack">${trs.map(x=>`<option value="${x.id}" ${x.id===cur?'selected':''}>${esc(x.nameAr)}</option>`).join('')}</select></label>
+   <label class="field"><span>التحدي</span><select id="te-ch" name="challengeId"><option value="">—</option>${DB.challenges.filter(c=>c.trackId===cur).map(c=>`<option value="${c.id}" ${c.id===tm?.challengeId?'selected':''}>${esc(c.title)}</option>`).join('')}</select></label>
+   <label class="field"><span>رابط الغرفة الافتراضية</span><input id="te-room" name="room" dir="ltr" placeholder="https://" value="${esc(tm?.room||'')}"></label>
+   <label class="field"><span>من يرى رابط الغرفة</span><select id="te-vis" name="roomVis"><option value="admins" ${tm?.roomVis!=='team_judges'?'selected':''}>الإدارة فقط</option><option value="team_judges" ${tm?.roomVis==='team_judges'?'selected':''}>الفريق والمحكمون</option></select></label>
+  </div><div class="note">إنشاء منصة اجتماعات أو عالم افتراضي ليس ضمن النطاق؛ يُحفظ الرابط وصلاحية عرضه فقط.</div><div class="acts">${btn('حفظ','teamsubmit',{},'pri')}</div></form></div>`}
+
+/* ---------- projects ---------- */
+function pg_projects(){const {h,err}=needH();if(err)return err;if(!can('project','v',h.id))return denied();const ps=projectsOf(h.id);
+  const cols=[{key:'ref',label:'الرقم المرجعي',text:p=>p.id.toUpperCase(),html:p=>`<span class="mono">${esc(p.id.toUpperCase())}</span>`},{key:'title',label:'الفكرة',text:p=>p.title,html:p=>`<b>${esc(p.title)}</b>`,fixed:1},{key:'tm',label:'الفريق',text:p=>TM(p.teamId)?.name},{key:'tr',label:'المسار',text:p=>T(p.trackId)?.nameAr,html:p=>trackTag(p.trackId)},
+   {key:'st',label:'الحالة',text:p=>PROJ[p.status][0],html:p=>pill(PROJ,p.status)},{key:'ver',label:'النسخة',text:p=>p.submissions.length,num:1},{key:'sub',label:'وقت آخر تسليم',text:p=>fmtDT(p.submissions.at(-1)?.at),sortv:p=>p.submissions.at(-1)?.at||'',html:p=>{const s=p.submissions.at(-1);return s?`<span class="num">${fmtDT(s.at)}</span> ${s.late?'<span class="pill bad">متأخر</span>':''}`:'<span class="muted">—</span>'}},
+   {key:'dl',label:'الموعد النهائي',text:()=>fmtDT(h.submissionDeadline)},{key:'ev',label:'التقييمات',text:p=>{const s=projectScore(p);return `${s.evs.length}/${s.req.length}`},num:1},{key:'fu',label:'المتابعة',text:p=>FOLLOW[p.follow.status][0],html:p=>pill(FOLLOW,p.follow.status)}];
+  return `<div class="wrap">${head(hc(h,'المشاريع والتسليمات'),'المشاريع والتسليمات','كل فريق له مشروع واحد. نتيجة المنافسة منفصلة عن متابعة الحل.',`${can('project','x',h.id)?btn('تصدير','export',{k:'projects'}):''}${can('project','c',h.id)?btn('مشروع جديد','projedit',{id:''},'pri'):''}`)}
+  ${table('proj',cols,ps,{row:'openproj',hidden:['dl'],filters:[{key:'st',label:'الحالة',get:p=>p.status,opts:Object.entries(PROJ).map(([k,v])=>[k,v[0]])},{key:'tr',label:'المسار',get:p=>p.trackId,opts:tracksOf(h.id).map(x=>[x.id,x.nameAr])}]})}</div>`}
+function projDrawer(p){const h=H(p.hid);const cE=can('project','e',p.hid),cAp=can('project','a',p.hid);const s=projectScore(p);const ed=UI.drawer.edit;
+  const next=(PROJ_T[p.status]||[]).filter(k=>['eligible','final'].includes(k)?cAp:cE);
+  return `<div class="dh"><div><div class="crumb">${esc(h.nameAr)} › مشروع <span class="mono">${esc(p.id.toUpperCase())}</span></div><h2>${esc(p.title)}</h2><div class="acts" style="margin-top:6px">${pill(PROJ,p.status)} ${trackTag(p.trackId)} <span class="tag">${esc(TM(p.teamId)?.name)}</span></div></div><button class="btn sm" data-a="close">إغلاق</button></div>
+  <div class="db">${ed?projForm(h,p):`
+   <div class="card"><div class="hd"><h3>الفكرة</h3>${cE?btn('تعديل','projedit',{id:p.id},'sm'):''}</div><div class="bd"><dl class="kv"><dt>المشكلة المستهدفة</dt><dd>${esc(p.problem||'—')}</dd><dt>الحل المقترح</dt><dd>${esc(p.solution||'—')}</dd><dt>الأثر المتوقع</dt><dd>${esc(p.impact||'—')}</dd><dt>المستفيدون</dt><dd>${esc(p.beneficiaries||'—')}</dd><dt>الجهات المشاركة</dt><dd>${esc(p.partners||'—')}</dd><dt>التحدي</dt><dd>${esc(DB.challenges.find(c=>c.id===p.challengeId)?.title||'—')}</dd><dt>النموذج الأولي</dt><dd>${p.prototypeUrl?`<a href="${esc(p.prototypeUrl)}" target="_blank" rel="noopener" dir="ltr">${esc(p.prototypeUrl)}</a>`:'—'}</dd><dt>العرض</dt><dd>${p.pitchUrl?`<a href="${esc(p.pitchUrl)}" target="_blank" rel="noopener">${esc(p.pitchUrl)}</a>`:'—'}</dd></dl></div></div>`}
+   <div class="card"><div class="hd"><h3>دورة المراجعة</h3></div><div class="bd" style="display:grid;gap:10px">
+    <div class="muted" style="font-size:.8rem">${Object.keys(PROJ).map(k=>k===p.status?`<b style="color:var(--fg)">${PROJ[k][0]}</b>`:PROJ[k][0]).join(' ← ')}</div>
+    ${next.length?`<label class="field"><span>ملاحظة الانتقال</span><textarea id="projNote" placeholder="مطلوبة عند «تحتاج تعديلًا»"></textarea></label><div class="acts">${next.map(k=>btn('نقل إلى: '+PROJ[k][0],'pstatus',{id:p.id,to:k},'sm'+(k==='eligible'?' pri':''))).join('')}</div>`:'<span class="muted">لا توجد انتقالات متاحة لدورك من هذه الحالة.</span>'}</div></div>
+   <div class="card"><div class="hd"><h3>نسخ التسليم</h3>${cE?btn('تسجيل نسخة جديدة','subadd',{id:p.id},'sm'):''}</div><div class="bd"><div class="list">${p.submissions.map(x=>`<div><span>نسخة <b class="num">${x.n}</b> ${esc(x.note||'')} ${x.late?'<span class="pill bad">بعد الموعد</span>':''}</span><span class="num muted" style="font-size:.8rem">${fmtDT(x.at)}</span></div>`).join('')||'<div class="muted">لا توجد تسليمات. رفع الملفات الفعلي غير منفذ في النموذج الأولي.</div>'}</div><small class="muted">الامتدادات المسموحة: ${esc(h.extensions)} · الحد: <span class="num">${h.maxFileKB}</span> كيلوبايت · الموعد: <span class="num">${fmtDT(h.submissionDeadline)}</span></small></div></div>
+   <div class="card"><div class="hd"><h3>التقييمات</h3><span class="num">${s.evs.length}/${s.req.length}</span></div><div class="bd"><div class="list">${s.req.map(j=>{const e=DB.evals.find(x=>x.projectId===p.id&&x.judgeId===j);return `<div><span>${esc(uname(j))}</span>${e?(e.status==='submitted'?'<span class="pill ok">مسلَّم</span>':'<span class="pill warn">مسودة</span>'):'<span class="pill neutral">لم يبدأ</span>'}</div>`}).join('')||'<div class="muted">لا يوجد محكمون مسندون لهذا المسار.</div>'}</div>${s.score!=null?`<div style="margin-top:8px">المتوسط الحالي: <b class="num">${r1(s.score)}</b> / 100</div>`:''}</div></div>
+   <div class="card"><div class="hd"><h3>متابعة الحل</h3>${pill(FOLLOW,p.follow.status)}</div><div class="bd">${followForm(p,cE)}</div></div>
+   <div class="card"><div class="hd"><h3>سجل التحديثات</h3></div><div class="bd"><div class="tl">${[...p.history].reverse().map(x=>`<div>${esc(x.text)}<br><small class="num">${fmtDT(x.at)} · ${esc(uname(x.by))}</small></div>`).join('')}</div></div></div></div>`}
+function projForm(h,p){const free=teamsOf(h.id).filter(tm=>!projOfTeam(tm.id)||tm.id===p?.teamId);
+  return `<div class="card"><div class="bd"><form class="form" data-form="projsave" data-id="${p?.id||''}"><div class="fgrid">
+   <label class="field full"><span>عنوان الفكرة <em>*</em></span><input id="pe-title" name="title" value="${esc(p?.title||'')}"></label>
+   <label class="field full"><span>الفريق <em>*</em></span><select id="pe-team" name="teamId">${free.length?'':'<option value="">لا توجد فرق بدون مشروع</option>'}${free.map(tm=>`<option value="${tm.id}" ${tm.id===p?.teamId?'selected':''}>${esc(tm.name)} — ${esc(T(tm.trackId)?.nameAr||'بدون مسار')}</option>`).join('')}</select><small>المسار والتحدي يُؤخذان من الفريق.</small></label>
+   ${[['problem','المشكلة المستهدفة'],['solution','الحل المقترح'],['impact','الأثر المتوقع']].map(([k,l])=>`<label class="field full"><span>${l}</span><textarea id="pe-${k}" name="${k}">${esc(p?.[k]||'')}</textarea></label>`).join('')}
+   <label class="field"><span>المستفيدون</span><input id="pe-ben" name="beneficiaries" value="${esc(p?.beneficiaries||'')}"></label><label class="field"><span>الجهات المشاركة</span><input id="pe-par" name="partners" value="${esc(p?.partners||'')}"></label>
+   <label class="field"><span>رابط النموذج الأولي</span><input id="pe-proto" name="prototypeUrl" dir="ltr" value="${esc(p?.prototypeUrl||'')}"></label><label class="field"><span>رابط العرض</span><input id="pe-pitch" name="pitchUrl" dir="ltr" value="${esc(p?.pitchUrl||'')}"></label>
+  </div><div class="acts">${btn('حفظ','projsubmit',{},'pri')}${p?btn('إلغاء','projcancel',{id:p.id}):''}</div></form></div></div>`}
+function followForm(p,cE){const f=p.follow;return `<form class="form" data-form="follow" data-id="${p.id}" ${cE?'':'inert'}><div class="fgrid">
+  <label class="field"><span>حالة المتابعة</span><select id="fu-st-${p.id}" name="status">${Object.entries(FOLLOW).map(([k,v])=>`<option value="${k}" ${f.status===k?'selected':''}>${v[0]}</option>`).join('')}</select></label>
+  <label class="field"><span>مسؤول المتابعة</span><input id="fu-ow-${p.id}" name="owner" value="${esc(f.owner)}"></label>
+  <label class="field"><span>الجهة المتبنية</span><input id="fu-en-${p.id}" name="adoptingEntity" value="${esc(f.adoptingEntity)}"></label>
+  <label class="field"><span>مرحلة التطوير</span><input id="fu-sg-${p.id}" name="stage" value="${esc(f.stage)}" placeholder="مثال: نموذج تجريبي ميداني"></label>
+  <label class="field full"><span>معايير الاختيار للتبني</span><input id="fu-cr-${p.id}" name="criteria" value="${esc(f.criteria)}"></label>
+  <label class="field full"><span>الأدلة على المخرجات</span><input id="fu-ev-${p.id}" name="evidence" value="${esc(f.evidence)}" placeholder="رابط تقرير أو محضر"></label>
+  <label class="field full"><span>ملاحظات</span><textarea id="fu-no-${p.id}" name="notes">${esc(f.notes)}</textarea></label></div>${cE?`<div class="acts">${btn('حفظ المتابعة','followsubmit',{},'sm pri')}</div>`:''}</form>`}
+function pg_follow(){const {h,err}=needH();if(err)return err;if(!can('project','v',h.id))return denied();const ps=projectsOf(h.id);const rr=h.results.rows||[];
+  const cols=[{key:'t',label:'المشروع',text:p=>p.title,html:p=>`<b>${esc(p.title)}</b>`,fixed:1},{key:'tr',label:'المسار',text:p=>T(p.trackId)?.nameAr,html:p=>trackTag(p.trackId)},
+   {key:'res',label:'نتيجة المنافسة',text:p=>{const r=rr.find(x=>x.projectId===p.id);return r&&r.rank&&['approved','published'].includes(h.results.state)?(r.prize?`فائز — المركز ${r.rank}`:`المركز ${r.rank}`):'غير معتمدة'}},
+   {key:'fs',label:'حالة المتابعة',text:p=>FOLLOW[p.follow.status][0],html:p=>pill(FOLLOW,p.follow.status)},{key:'own',label:'المسؤول',text:p=>p.follow.owner||'—'},{key:'ent',label:'الجهة المتبنية',text:p=>p.follow.adoptingEntity||'—'},{key:'sg',label:'المرحلة',text:p=>p.follow.stage||'—'}];
+  return `<div class="wrap">${head(hc(h,'متابعة الحلول'),'متابعة الحلول','تتبع قرارات التبني ومراحل التطوير بعد الفعالية، بغض النظر عن نتيجة المنافسة.')}
+  <div class="kpis">${Object.entries(FOLLOW).filter(([k])=>k!=='none').map(([k,v])=>kpi(v[0],ps.filter(p=>p.follow.status===k).length,'مشروع',v[1]==='neutral'?'neutral':v[1])).join('')}</div>
+  ${table('follow',cols,ps,{row:'openproj'})}</div>`}
+
+/* ---------- judging ---------- */
+function pg_judging(){const {h,err}=needH();if(err)return err;if(!can('judging','v',h.id))return denied();const tab=UI.tab.judging||'assign';const cE=can('judging','e',h.id);
+  const judges=DB.users.filter(u=>u.role==='judge'&&u.active&&inScope(u,h.id));const trs=tracksOf(h.id);let body='';
+  if(tab==='assign')body=`<div class="card"><div class="hd"><div><h2>إسناد المحكمين للمسارات</h2><div class="muted" style="font-size:.82rem">المحكم يقيّم كل المشاريع المؤهلة في مساراته، عدا ما استُبعد منه بتعارض مصالح.</div></div>${can('users','c')?btn('إضافة محكم','uedit',{id:'',role:'judge'},'sm'):''}</div>
+   ${judges.length?`<div class="tbl-wrap"><table class="tbl matrix"><thead><tr><th>المحكم</th><th>التخصص</th>${trs.map(x=>`<th>${trackTag(x.id)}</th>`).join('')}<th>المشاريع المسندة</th></tr></thead><tbody>${judges.map(j=>`<tr><td><b>${esc(j.name)}</b></td><td>${esc(j.specialty||'—')}</td>${trs.map(x=>`<td><input type="checkbox" aria-label="${esc(j.name)} — ${esc(x.nameAr)}" data-ch="jt" data-j="${j.id}" data-t="${x.id}" ${DB.judgeTracks.some(z=>z.judgeId===j.id&&z.trackId===x.id)?'checked':''} ${cE?'':'disabled'}></td>`).join('')}<td class="n">${projectsOf(h.id).filter(p=>requiredJudges(p).includes(j.id)).length}</td></tr>`).join('')}</tbody></table></div>`:empty('لا يوجد محكمون في نطاق هذا الهاكاثون','أضف مستخدمًا بدور «محكم» وأضف الهاكاثون إلى نطاقه.')}</div>`;
+  if(tab==='coi'){const list=DB.coi.filter(c=>c.hid===h.id);body=`<div class="note warn"><b>آلية مقترحة تحتاج اعتمادًا:</b> المحكم يفصح عن التعارض (أو يسجله مسؤول التحكيم)، ثم يعتمد مسؤول التحكيم الاستبعاد. عند الاعتماد يُحذف أي تقييم مسودة، ولا يُحتسب المحكم ضمن المطلوبين للمشروع، ويُمنع من رؤيته.</div>
+   <div class="card"><div class="hd"><h2>الإفصاحات</h2>${can('judging','c',h.id)?btn('تسجيل إفصاح','coinew',{},'sm'):''}</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>المحكم</th><th>المشروع</th><th>طبيعة التعارض</th><th>التاريخ</th><th>الحالة</th><th></th></tr></thead><tbody>${list.map(c=>`<tr><td>${esc(uname(c.judgeId))}</td><td>${esc(PR(c.projectId)?.title)}</td><td style="max-width:320px">${esc(c.reason)}</td><td class="n">${fmtD(c.at)}</td><td>${c.status==='pending'?'<span class="pill warn">بانتظار الاعتماد</span>':c.status==='approved'?'<span class="pill bad">مستبعد</span>':'<span class="pill neutral">مرفوض</span>'}</td><td>${c.status==='pending'&&can('judging','a',h.id)?`<div class="acts">${btn('اعتماد الاستبعاد','coiok',{id:c.id},'sm pri')}${btn('رفض','coino',{id:c.id},'sm')}</div>`:''}</td></tr>`).join('')||`<tr><td colspan="6">${empty('لا توجد إفصاحات','')}</td></tr>`}</tbody></table></div></div>`}
+  if(tab==='sessions'){const ss=DB.sessions.filter(s=>s.hid===h.id).sort((a,b)=>a.start<b.start?-1:1);
+    body=`<div class="card"><div class="hd"><div><h2>جلسات التحكيم</h2><div class="muted" style="font-size:.82rem">يُمنع الحفظ عند تعارض محكم أو فريق أو قاعة في الوقت نفسه.</div></div>${can('judging','c',h.id)?btn('جدولة جلسة','sesedit',{id:''},'sm pri'):''}</div>
+     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>الجلسة</th><th>الموعد</th><th>المدة</th><th>القاعة/الغرفة</th><th>المحكمون</th><th>الفرق</th><th></th></tr></thead><tbody>${ss.map(s=>`<tr><td><b>${esc(s.title)}</b></td><td class="n">${fmtDT(s.start)}</td><td class="n">${s.duration} د</td><td>${esc(s.room)}</td><td>${s.judgeIds.map(j=>`<span class="tag">${esc(uname(j))}</span>`).join(' ')}</td><td>${s.projectIds.map(p=>`<span class="tag">${esc(TM(PR(p)?.teamId)?.name||'—')}</span>`).join(' ')}</td><td>${cE?`<div class="acts">${btn('تعديل','sesedit',{id:s.id},'sm')}${can('judging','d',h.id)?btn('حذف','sesdel',{id:s.id},'sm danger'):''}</div>`:''}</td></tr>`).join('')||`<tr><td colspan="7">${empty('لا توجد جلسات','جدول أول جلسة بعد إسناد المحكمين وتأهيل المشاريع.')}</td></tr>`}</tbody></table></div></div>`}
+  if(tab==='progress'){const ps=projectsOf(h.id).filter(p=>['eligible','evaluated','final'].includes(p.status));const canRe=can('evaluation','a',h.id);
+    const judgesRows=judges.map(j=>{const mine=ps.filter(p=>requiredJudges(p).includes(j.id));const sub=mine.filter(p=>DB.evals.find(e=>e.projectId===p.id&&e.judgeId===j.id)?.status==='submitted').length;const dr=mine.filter(p=>DB.evals.find(e=>e.projectId===p.id&&e.judgeId===j.id)?.status==='draft').length;return {j,total:mine.length,sub,dr}});
+    body=`<div class="card"><div class="hd"><h2>تقدم التحكيم حسب المحكم</h2></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>المحكم</th><th>المطلوب</th><th>مسلَّم</th><th>مسودة</th><th>لم يبدأ</th><th style="min-width:140px">النسبة</th></tr></thead><tbody>${judgesRows.map(r=>`<tr><td>${esc(r.j.name)}</td><td class="n">${r.total}</td><td class="n">${r.sub}</td><td class="n">${r.dr}</td><td class="n">${r.total-r.sub-r.dr}</td><td><div class="bar"><span style="width:${r.total?r.sub/r.total*100:0}%"></span></div><small class="num">${r.total?Math.round(r.sub/r.total*100):0}%</small></td></tr>`).join('')}</tbody></table></div></div>
+     <div class="card"><div class="hd"><h2>تفاصيل التقييمات حسب المشروع</h2></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>المشروع</th><th>المسار</th><th>المحكم</th><th>الحالة</th><th>الدرجة /100</th><th>إعادة فتح</th><th></th></tr></thead><tbody>${ps.flatMap(p=>requiredJudges(p).map(j=>{const e=DB.evals.find(x=>x.projectId===p.id&&x.judgeId===j);const sc=e&&e.status==='submitted'?sum(critOf(p.trackId).map(c=>e.scores[c.code]/h.scoreMax*c.weight)):null;
+      return `<tr><td>${esc(p.title)}</td><td>${trackTag(p.trackId)}</td><td>${esc(uname(j))}</td><td>${e?(e.status==='submitted'?'<span class="pill ok">مسلَّم</span>':'<span class="pill warn">مسودة</span>'):'<span class="pill neutral">لم يبدأ</span>'}</td><td class="n">${r1(sc)}</td><td style="font-size:.78rem">${e?.reopens?.length?e.reopens.map(r=>`${esc(r.reason)} <small class="muted num">(${fmtD(r.at)})</small>`).join('<br>'):'—'}</td><td>${e?.status==='submitted'&&canRe?btn('إعادة فتح','reopen',{id:e.id},'sm'):''}</td></tr>`})).join('')||`<tr><td colspan="7">${empty('لا توجد مشاريع مؤهلة للتحكيم','')}</td></tr>`}</tbody></table></div></div>`}
+  return `<div class="wrap">${head(hc(h,'المحكمون والجلسات'),'المحكمون والجلسات',`المقياس <span class="num">${h.scoreMin}–${h.scoreMax}</span> · المعايير من صفحة «معايير التحكيم» · التقييمات الناقصة: ${INC[h.incompletePolicy]}`)}
+  <div class="tabs" role="tablist">${[['assign','الإسناد'],['coi','تعارض المصالح'],['sessions','الجلسات'],['progress','تقدم التقييمات']].map(([k,l])=>`<button role="tab" class="${tab===k?'on':''}" data-a="tab" data-g="judging" data-k="${k}">${l}${k==='coi'&&DB.coi.some(c=>c.hid===h.id&&c.status==='pending')?' •':''}</button>`).join('')}</div>${body}</div>`}
+function sessionDrawer(h,s){const ps=projectsOf(h.id).filter(p=>['eligible','evaluated'].includes(p.status));const js=DB.users.filter(u=>u.role==='judge'&&inScope(u,h.id)&&u.active);
+  return `<div class="dh"><div><div class="crumb">${esc(h.nameAr)} › الجلسات</div><h2>${s?'تعديل جلسة':'جدولة جلسة'}</h2></div><button class="btn sm" data-a="close">إغلاق</button></div>
+  <div class="db"><form class="form" data-form="sessave" data-id="${s?.id||''}"><div class="fgrid">
+   <label class="field full"><span>العنوان <em>*</em></span><input id="se-title" name="title" value="${esc(s?.title||'')}"></label>
+   <label class="field"><span>الموعد <em>*</em></span><input id="se-start" type="datetime-local" name="start" value="${esc(s?.start||'2026-10-27T13:00')}"></label>
+   <label class="field"><span>المدة بالدقائق <em>*</em></span><input id="se-dur" type="number" min="5" name="duration" value="${esc(s?.duration||60)}"></label>
+   <label class="field"><span>القاعة / الغرفة <em>*</em></span><input id="se-room" name="room" value="${esc(s?.room||'')}"></label>
+   <label class="field"><span>رابط الغرفة الافتراضية</span><input id="se-link" name="link" dir="ltr" value="${esc(s?.link||'')}"></label>
+   <fieldset class="full" style="grid-column:1/-1"><legend>المحكمون</legend>${js.map(j=>`<label class="chk"><input type="checkbox" name="judgeIds" value="${j.id}" ${s?.judgeIds.includes(j.id)?'checked':''}> ${esc(j.name)} <small class="muted">${DB.judgeTracks.filter(x=>x.judgeId===j.id&&x.hid===h.id).map(x=>T(x.trackId).nameAr).join('، ')}</small></label>`).join('')||'<span class="muted">لا يوجد محكمون.</span>'}</fieldset>
+   <fieldset class="full" style="grid-column:1/-1"><legend>المشاريع (الفرق)</legend>${ps.map(p=>`<label class="chk"><input type="checkbox" name="projectIds" value="${p.id}" ${s?.projectIds.includes(p.id)?'checked':''}> ${esc(p.title)} <small class="muted">${esc(TM(p.teamId)?.name)} · ${esc(T(p.trackId)?.nameAr)}</small></label>`).join('')||'<span class="muted">لا توجد مشاريع مؤهلة للتحكيم.</span>'}</fieldset>
+  </div><div class="err" id="seErr" role="alert"></div><div class="acts">${btn('حفظ الجلسة','sessubmit',{},'pri')}</div></form></div>`}
+
+/* ---------- judge view ---------- */
+function pg_myreviews(){const u=me();if(u.role!=='judge')return denied('هذه الصفحة لحسابات المحكمين. استخدم «الدخول كـ» لتجربة دور المحكم.');
+  const {h,err}=needH();if(err)return err;const ps=projectsOf(h.id).filter(p=>judgeCanSee(p,u.id));const ses=DB.sessions.filter(s=>s.hid===h.id&&s.judgeIds.includes(u.id));
+  return `<div class="wrap">${head(hc(h,'تقييماتي'),'تقييماتي',`مرحبًا ${esc(u.name)}. تظهر هنا المشاريع المسندة إليك فقط. المقياس <span class="num">${h.scoreMin}–${h.scoreMax}</span>.`)}
+  <div class="kpis">${kpi('مسندة إليّ',ps.length,'مشروع','info')}${kpi('مسلَّمة',ps.filter(p=>DB.evals.find(e=>e.projectId===p.id&&e.judgeId===u.id)?.status==='submitted').length,'تقييم','ok')}${kpi('مسودات',ps.filter(p=>DB.evals.find(e=>e.projectId===p.id&&e.judgeId===u.id)?.status==='draft').length,'تقييم','warn')}</div>
+  <div class="grid g2"><div class="card"><div class="hd"><h2>المشاريع</h2></div><div class="bd"><div class="list">${ps.map(p=>{const e=DB.evals.find(x=>x.projectId===p.id&&x.judgeId===u.id);return `<button data-a="openeval" data-id="${p.id}"><span><b>${esc(p.title)}</b><br><small class="muted">${esc(TM(p.teamId)?.name)} · ${esc(T(p.trackId)?.nameAr)}</small></span>${e?(e.status==='submitted'?'<span class="pill ok">مسلَّم</span>':'<span class="pill warn">مسودة</span>'):'<span class="pill neutral">لم يبدأ</span>'}</button>`}).join('')||'<div class="muted">لا توجد مشاريع مسندة إليك حاليًا.</div>'}</div></div></div>
+  <div class="card"><div class="hd"><h2>جلساتي</h2></div><div class="bd"><div class="list">${ses.map(s=>`<div><span>${esc(s.title)}<br><small class="muted">${esc(s.room)}</small></span><span class="num" style="font-size:.8rem">${fmtDT(s.start)}</span></div>`).join('')||'<div class="muted">لا توجد جلسات.</div>'}</div></div></div></div></div>`}
+function evalDrawer(p){const u=me();const h=H(p.hid);const e=DB.evals.find(x=>x.projectId===p.id&&x.judgeId===u.id);const ro=e?.status==='submitted';const crit=critOf(p.trackId);const tm=TM(p.teamId);
+  const range=[];for(let i=h.scoreMin;i<=h.scoreMax;i++)range.push(i);
+  return `<div class="dh"><div><div class="crumb">${esc(h.nameAr)} › تقييم</div><h2>${esc(p.title)}</h2><div class="acts" style="margin-top:6px">${trackTag(p.trackId)} <span class="tag">${esc(tm?.name)}</span> ${ro?'<span class="pill ok">مسلَّم نهائيًا</span>':e?'<span class="pill warn">مسودة</span>':''}</div></div><button class="btn sm" data-a="close">إغلاق</button></div>
+  <div class="db"><div class="card"><div class="bd"><dl class="kv"><dt>المشكلة</dt><dd>${esc(p.problem||'—')}</dd><dt>الحل</dt><dd>${esc(p.solution||'—')}</dd><dt>الأثر</dt><dd>${esc(p.impact||'—')}</dd><dt>النموذج الأولي</dt><dd>${p.prototypeUrl?`<a href="${esc(p.prototypeUrl)}" target="_blank" rel="noopener" dir="ltr">${esc(p.prototypeUrl)}</a>`:'—'}</dd>${tm?.room&&tm.roomVis==='team_judges'?`<dt>غرفة الفريق</dt><dd><a href="${esc(tm.room)}" target="_blank" rel="noopener">${esc(tm.room)}</a></dd>`:''}</dl></div></div>
+  <form class="card" data-form="evalsave" data-id="${p.id}"><div class="hd"><h3>الدرجات</h3><span class="muted" style="font-size:.8rem">الوزن يظهر بجانب كل معيار</span></div><div class="bd">
+   ${crit.map(c=>`<div class="score-row"><div><b>${esc(c.nameAr)}</b> <span class="tag num">${c.weight}%</span></div><div class="scale" role="radiogroup" aria-label="${esc(c.nameAr)}">${range.map(i=>`<label><input type="radio" name="s_${c.code}" value="${i}" ${e?.scores?.[c.code]===i?'checked':''} ${ro?'disabled':''}><span>${i}</span></label>`).join('')}</div></div>`).join('')}
+   <label class="field" style="margin-top:12px"><span>تعليق للفريق المنظم</span><textarea id="ev-comment" name="comment" ${ro?'disabled':''}>${esc(e?.comment||'')}</textarea></label>
+   <div class="err" id="evErr" role="alert"></div>
+   ${ro?'<div class="note">سُلّم هذا التقييم نهائيًا ولا يمكن تعديله. إعادة الفتح تتم من مسؤول التحكيم مع ذكر السبب.</div>':`<div class="acts" style="margin-top:12px">${btn('حفظ كمسودة','evaldraft',{},'')}${btn('تسليم نهائي','evalsubmit',{},'pri')}</div>`}
+  </div></form>
+  ${!ro?`<div class="card"><div class="hd"><h3>إفصاح عن تعارض مصالح</h3></div><div class="bd"><form class="form" data-form="coiself" data-id="${p.id}"><label class="field"><span>إذا كانت لك علاقة بالفريق أو بالفكرة، صف التعارض</span><textarea id="coiTxt" name="reason"></textarea></label><div class="acts">${btn('إرسال الإفصاح','coiselfsubmit',{},'sm')}</div></form></div></div>`:''}</div>`}
+
+/* ---------- results ---------- */
+function pg_results(){const {h,err}=needH();if(err)return err;if(!can('results','v',h.id))return denied();const r=h.results;const st=r.state;
+  const steps=[['احتساب','calculated'],['اعتماد','approved'],['نشر','published']];const idx={none:-1,calculated:0,approved:1,published:2}[st];
+  const rows=r.rows||[];const incomplete=rows.filter(x=>!x.complete);const ties=rows.filter(x=>x.tieUnresolved);
+  const cols=[{key:'rank',label:'الترتيب داخل المسار',text:x=>x.rank??'',sortv:x=>(T(x.trackId)?.order||0)*1000+(x.rank||999),html:x=>x.excluded?'<span class="pill bad">مستبعد</span>':`<b class="num">${x.rank}</b>${x.tie?' <span class="pill warn">تعادل</span>':''}${x.adjusted?' <span class="pill purple">معدّل يدويًا</span>':''}`},
+   {key:'prize',label:'المركز الفائز',text:x=>x.prize||'',html:x=>x.prize?`<span class="pill ok">${esc(x.prize)}</span>`:'<span class="muted">—</span>'},{key:'proj',label:'المشروع',text:x=>PR(x.projectId)?.title},{key:'team',label:'الفريق',text:x=>TM(x.teamId)?.name},{key:'tr',label:'المسار',text:x=>T(x.trackId)?.nameAr,html:x=>trackTag(x.trackId)},
+   {key:'score',label:'النتيجة النهائية /100',text:x=>r1(x.score),sortv:x=>x.score??-1,num:1},{key:'done',label:'التقييمات المكتملة',text:x=>`${x.done}/${x.required}`,html:x=>`<span class="num">${x.done}/${x.required}</span> ${x.complete?'':'<span class="pill warn">ناقص</span>'}`},
+   {key:'st',label:'الحالة',text:()=>RST[st][0],html:()=>pill(RST,st)},{key:'ap',label:'الاعتماد',text:()=>r.approvedBy?uname(r.approvedBy):'—'},{key:'pub',label:'تاريخ النشر',text:()=>st==='published'?fmtDT(r.publishedAt):'—'},
+   {key:'act',label:'',nosort:1,fixed:1,text:()=>'',html:x=>can('results','a',h.id)&&!x.excluded&&st!=='published'?btn('تعديل الترتيب','adj',{id:x.projectId},'sm'):''}];
+  return `<div class="wrap">${head(hc(h,'النتائج والاعتماد'),'النتائج والاعتماد','الاحتساب والاعتماد والنشر ثلاث خطوات منفصلة. أي تغيير في التقييمات بعد الاحتساب يسحب الاعتماد ويتطلب إعادة الاحتساب.',
+   `${can('results','x',h.id)&&rows.length?btn('تصدير','export',{k:'results'}):''}${can('results','c',h.id)&&st!=='published'?btn(st==='none'?'احتساب النتائج':'إعادة الاحتساب','calc',{},'pri'):''}`)}
+  <div class="steps">${steps.map(([l,k],i)=>`<div class="${i<=idx?'done':i===idx+1?'cur':''}"><b>${i+1}. ${l}</b><span class="muted">${i===0?(r.calcAt?`${fmtDT(r.calcAt)} · ${esc(uname(r.calcBy))}`:'لم يتم'):i===1?(r.approvedAt?`${fmtDT(r.approvedAt)} · ${esc(uname(r.approvedBy))}`:'لم يتم'):(r.publishedAt&&st==='published'?fmtDT(r.publishedAt):'لم يتم')}</span></div>`).join('')}</div>
+  <div class="note"><b>قاعدة الاحتساب:</b> درجة المحكم = Σ (الدرجة ÷ ${h.scoreMax} × وزن المعيار). نتيجة المشروع = متوسط درجات المحكمين المطلوبين المسلَّمة. <b>التعادل:</b> ${TIE[h.tieRule]}${h.tieRule==='criteria'?` (${(h.tieOrder||[]).map(k=>h.criteria.find(c=>c.code===k)?.nameAr||k).join(' ← ')||'لم يُحدد ترتيب'})`:''}. <b>الناقص:</b> ${INC[h.incompletePolicy]}. ${btn('تعديل القواعد','go',{p:'settings'},'sm')}</div>
+  ${r.stale?'<div class="note bad"><b>النتائج قديمة:</b> تغيّرت التقييمات أو الإسنادات بعد آخر احتساب. أعد الاحتساب.</div>':''}
+  ${incomplete.length?`<div class="note warn"><b class="num">${incomplete.length}</b> مشروع بتقييمات ناقصة: ${incomplete.map(x=>esc(PR(x.projectId).title)+` (<span class="num">${x.done}/${x.required}</span>)`).join('، ')}. ${h.incompletePolicy==='block'?'استُبعدت من الترتيب ويُمنع الاعتماد حتى تكتمل.':'احتُسبت بالمتاح وهي مميزة بـ«ناقص».'}</div>`:''}
+  ${ties.length?`<div class="note warn"><b>تعادل يحتاج قرارًا:</b> ${ties.map(x=>esc(PR(x.projectId).title)).join('، ')}. استخدم «تعديل الترتيب» مع ذكر السبب.</div>`:''}
+  ${st==='none'?`<div class="card">${empty('لم تُحتسب النتائج بعد','اضغط «احتساب النتائج» بعد اكتمال التقييمات. يمكن الاحتساب للمراجعة في أي وقت.')}</div>`:table('res',cols,rows,{sort:'rank',filters:[{key:'tr',label:'المسار',get:x=>x.trackId,opts:tracksOf(h.id).map(x=>[x.id,x.nameAr])}]})}
+  ${st!=='none'?`<div class="card"><div class="hd"><h2>الاعتماد والنشر</h2></div><div class="bd" style="display:grid;gap:12px">
+   <div class="acts">${st==='calculated'&&can('results','a',h.id)?btn('اعتماد النتائج','approve',{},'pri'):''}${st==='approved'&&can('results','p',h.id)?btn('نشر النتائج','publish',{},'pri'):''}${st==='published'&&can('results','p',h.id)?btn('إيقاف النشر','unpublish',{}):''}</div>
+   <div><b>الحقول التي تُنشر للعامة:</b> المسار، المركز، اسم الفريق، عنوان المشروع. لا تُنشر الدرجات التفصيلية أو أسماء المحكمين أو بيانات المشاركين.</div>
+   ${['approved','published'].includes(st)?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>المسار</th><th>المركز</th><th>الفريق</th><th>المشروع</th></tr></thead><tbody>${rows.filter(x=>x.prize).map(x=>`<tr><td>${esc(T(x.trackId).nameAr)}</td><td>${esc(x.prize)}</td><td>${esc(TM(x.teamId).name)}</td><td>${esc(PR(x.projectId).title)}</td></tr>`).join('')}</tbody></table></div>`:''}
+   ${Object.keys(r.overrides||{}).length?`<div><b>التعديلات الإدارية</b><div class="tl" style="margin-top:6px">${Object.entries(r.overrides).map(([pid,o])=>`<div>${esc(PR(pid).title)} ← المركز ${o.rank}: ${esc(o.reason)}<br><small class="num">${fmtDT(o.at)} · ${esc(uname(o.by))}</small></div>`).join('')}</div></div>`:''}
+   <div class="note">النشر هنا يغيّر الحالة داخل المنصة فقط. الربط مع الموقع العام لم يُنفذ.</div></div></div>`:''}</div>`}
+
+function pg_later(name){return `<div class="wrap">${head(t('لاحقًا'),t(name),'')}<div class="card">${empty('لم يُنفذ في النسخة الأولى',`«${name}» موجود في النظام الحالي أو في المتطلبات، ولم يُبنَ في هذا النموذج. انظر «فهم المنصة والخطة» للنقاط التي تحتاج تأكيدًا.`,btn('فتح الخطة','go',{p:'about'},'sm'))}</div></div>`}
+function pg_search(){const {h,err}=needH();if(err)return err;const q=UI.q.trim().toLowerCase();if(!q)return `<div class="wrap">${empty('اكتب كلمة للبحث','')}</div>`;
+  const m=s=>String(s||'').toLowerCase().includes(q);
+  const ap=can('application','v',h.id)?appsOf(h.id).filter(a=>m(a.name)||m(a.nameEn)||m(a.email)||m(a.org)):[];const tm=can('team','v',h.id)?teamsOf(h.id).filter(x=>m(x.name)):[];const pj=can('project','v',h.id)?projectsOf(h.id).filter(p=>m(p.title)||m(p.id)):[];
+  return `<div class="wrap">${head(hc(h,'بحث'),`نتائج «${UI.q}»`,`${ap.length+tm.length+pj.length} نتيجة داخل هذا الهاكاثون فقط`)}<div class="grid g3">
+  <div class="card"><div class="hd"><h2>الطلبات</h2></div><div class="bd"><div class="list">${ap.map(a=>`<button data-a="openapp" data-id="${a.id}"><span>${esc(a.name)}</span>${pill(DEC,a.decision)}</button>`).join('')||'<div class="muted">لا شيء</div>'}</div></div></div>
+  <div class="card"><div class="hd"><h2>الفرق</h2></div><div class="bd"><div class="list">${tm.map(x=>`<button data-a="go" data-p="teams"><span>${esc(x.name)}</span></button>`).join('')||'<div class="muted">لا شيء</div>'}</div></div></div>
+  <div class="card"><div class="hd"><h2>المشاريع</h2></div><div class="bd"><div class="list">${pj.map(p=>`<button data-a="openproj" data-id="${p.id}"><span>${esc(p.title)}</span>${pill(PROJ,p.status)}</button>`).join('')||'<div class="muted">لا شيء</div>'}</div></div></div></div></div>`}
+
+/* ---------- user drawer ---------- */
+function userDrawer(u,role){const hs=DB.hackathons;const r=u?.role||role||'registrar';
+  return `<div class="dh"><div><div class="crumb">المستخدمون</div><h2>${u?'تعديل مستخدم':'إضافة مستخدم'}</h2></div><button class="btn sm" data-a="close">إغلاق</button></div>
+  <div class="db"><form class="form" data-form="usersave" data-id="${u?.id||''}"><div class="fgrid">
+   <label class="field"><span>الاسم بالعربية <em>*</em></span><input id="us-name" name="name" value="${esc(u?.name||'')}"></label><label class="field"><span>الاسم بالإنجليزية</span><input id="us-en" name="nameEn" dir="ltr" value="${esc(u?.nameEn||'')}"></label>
+   <label class="field"><span>البريد <em>*</em></span><input id="us-email" name="email" dir="ltr" value="${esc(u?.email||'')}"></label>
+   <label class="field"><span>الدور</span><select id="us-role" name="role">${Object.entries(ROLES).map(([k,l])=>`<option value="${k}" ${k===r?'selected':''}>${l}</option>`).join('')}</select></label>
+   <label class="field full"><span>التخصص (للمحكمين)</span><input id="us-sp" name="specialty" value="${esc(u?.specialty||'')}"></label>
+   <label class="field full"><span>${u?'كلمة مرور جديدة (اتركها فارغة للإبقاء على الحالية)':'كلمة المرور الأولى <em>*</em>'}</span><input id="us-pw" name="password" type="password" autocomplete="new-password"><small>10 أحرف على الأقل. سلّمها للمستخدم بطريقة آمنة واطلب منه تغييرها.</small></label>
+   <fieldset class="full" style="grid-column:1/-1"><legend>نطاق الهاكاثونات</legend><label class="chk"><input type="checkbox" name="all" ${u?.scope==='all'?'checked':''}> كل الهاكاثونات (لمدير النظام)</label>${hs.map(h=>`<label class="chk"><input type="checkbox" name="scope" value="${h.id}" ${u&&u.scope!=='all'&&u.scope.includes(h.id)?'checked':''}> ${esc(h.nameAr)}</label>`).join('')}</fieldset>
+  </div><div class="err" id="usErr"></div><div class="acts">${btn('حفظ','usersubmit',{},'pri')}${u&&u.id!==UI.user?btn(u.active?'إيقاف الحساب':'تفعيل الحساب','uactive',{id:u.id,on:u.active?'':'1'},u.active?'danger':''):''}</div></form>
+  <div class="note">لا تُرسل المنصة رسائل بريد. أبلغ المستخدم ببريده وكلمة مروره الأولى بنفسك.</div></div>`}
+
+/* =========================================================
+   Render
+   ========================================================= */
+const PAGES={dash:pg_dash,hackathons:pg_hackathons,hnew:pg_hnew,users:pg_users,audit:pg_audit,about:pg_about,overview:pg_overview,settings:pg_settings,tracks:pg_tracks,criteria:pg_criteria,apps:pg_apps,teams:pg_teams,projects:pg_projects,follow:pg_follow,judging:pg_judging,results:pg_results,myreviews:pg_myreviews,search:pg_search};
+function drawerHtml(){const d=UI.drawer;if(!d)return '';const h=H(UI.hid);let inner='';
+  try{if(d.type==='app'){const a=A(d.id);guardScope(a.hid);if(!can('application','v',a.hid))throw new Denied('لا تملك صلاحية عرض الطلبات.');inner=appDrawer(a)}
+   else if(d.type==='newapp')inner=newAppDrawer(h);
+   else if(d.type==='team')inner=teamDrawer(h,d.id?TM(d.id):null);
+   else if(d.type==='proj'){const p=PR(d.id);guardScope(p.hid);inner=projDrawer(p)}
+   else if(d.type==='projnew')inner=`<div class="dh"><div><div class="crumb">${esc(h.nameAr)}</div><h2>مشروع جديد</h2></div><button class="btn sm" data-a="close">إغلاق</button></div><div class="db">${projForm(h,null)}</div>`;
+   else if(d.type==='track')inner=trackDrawer(h,d.id?T(d.id):null);
+   else if(d.type==='session')inner=sessionDrawer(h,d.id?DB.sessions.find(s=>s.id===d.id):null);
+   else if(d.type==='eval'){const p=PR(d.id);if(!judgeCanSee(p,UI.user))throw new Denied('هذا المشروع غير مسند إليك.');inner=evalDrawer(p)}
+   else if(d.type==='user')inner=userDrawer(d.id?U(d.id):null,d.role);
+   else if(d.type==='preview')inner=previewDrawer(H(d.id));
+  }catch(e){inner=`<div class="dh"><h2>غير متاح</h2><button class="btn sm" data-a="close">إغلاق</button></div><div class="db">${denied(e.message)}</div>`}
+  return `<div class="scrim" data-a="close"></div><aside class="drawer" role="dialog" aria-modal="true">${inner}</aside>`}
+function trackDrawer(h,tr){const crit=h.criteria.filter(c=>c.enabled);const chs=tr?DB.challenges.filter(c=>c.trackId===tr.id).map(c=>c.title).join('\n'):'';
+  return `<div class="dh"><div><div class="crumb">${esc(h.nameAr)} › المسارات</div><h2>${tr?'تعديل مسار':'إضافة مسار'}</h2></div><button class="btn sm" data-a="close">إغلاق</button></div>
+  <div class="db"><form class="form" data-form="tracksave" data-id="${tr?.id||''}"><div class="fgrid">
+   <label class="field"><span>الاسم (عربي) <em>*</em></span><input id="tr-ar" name="nameAr" value="${esc(tr?.nameAr||'')}"></label><label class="field"><span>الاسم (إنجليزي)</span><input id="tr-en" name="nameEn" dir="ltr" value="${esc(tr?.nameEn||'')}"></label>
+   <label class="field full"><span>الوصف</span><textarea id="tr-desc" name="descAr">${esc(tr?.descAr||'')}</textarea></label>
+   <label class="field"><span>اللون</span><input id="tr-color" type="color" name="color" value="${esc(tr?.color||'#0A7468')}"></label>
+   <label class="field"><span>الأيقونة</span><select id="tr-icon" name="icon">${['route','building','leaf','bolt','chip','heart','bulb'].map(k=>`<option value="${k}" ${tr?.icon===k?'selected':''}>${({route:'مسار',building:'مبنى',leaf:'ورقة',bolt:'طاقة',chip:'تقنية',heart:'صحة',bulb:'فكرة'})[k]}</option>`).join('')}</select></label>
+   <label class="field full"><span>التحديات (تحدٍ في كل سطر)</span><textarea id="tr-ch" name="challenges">${esc(chs)}</textarea><small>التحدي المرتبط بفريق لا يمكن حذفه.</small></label>
+   <label class="field"><span>عدد المراكز الفائزة</span><input id="tr-win" type="number" min="0" max="10" name="winners" value="${tr?.winners??3}"></label>
+   <label class="field"><span>الجوائز (جائزة في كل سطر بترتيب المراكز)</span><textarea id="tr-pr" name="prizes">${esc((tr?.prizes||[]).join('\n'))}</textarea></label>
+   <fieldset class="full" style="grid-column:1/-1"><legend>أوزان المعايير</legend><label class="chk"><input type="checkbox" id="tr-own" name="own" data-ch="trown" ${tr?.weights?'checked':''}> استخدام أوزان خاصة بهذا المسار</label>
+    <div id="trW" ${tr?.weights?'':'hidden'} style="display:grid;gap:6px">${crit.map(c=>`<label class="chk" style="justify-content:space-between"><span>${esc(c.nameAr)} <span class="tag mono">${esc(c.code)}</span> <small class="muted">الافتراضي ${c.weight}%</small></span><input type="number" min="0" max="100" name="w_${c.code}" value="${tr?.weights?.[c.code]??c.weight}" style="width:80px;border:1px solid var(--line);border-radius:8px;padding:4px 8px;background:var(--surface)" class="num" data-in="trsum"></label>`).join('')}<div>المجموع: <span id="trSum" class="sum">—</span></div></div></fieldset>
+  </div><div class="err" id="trErr"></div><div class="acts">${btn('حفظ المسار','tracksubmit',{},'pri')}</div></form></div>`}
+function previewDrawer(h){const trs=tracksOf(h.id);return `<div class="dh"><div><div class="crumb">معاينة — لا تُنشر</div><h2>المحتوى العام</h2></div><button class="btn sm" data-a="close">إغلاق</button></div>
+  <div class="db"><div class="card" style="overflow:hidden"><div style="background:${esc(h.color)};color:#fff;padding:26px 20px;display:grid;gap:6px">${h.logo?`<img src="${h.logo}" alt="" style="max-height:44px;justify-self:start">`:''}<h2 style="font-size:1.4rem">${esc(h.nameAr)}</h2><div>${esc(h.descAr||'')}</div><div class="num" style="opacity:.85">${fmtD(h.eventStart)} → ${fmtD(h.eventEnd)} · ${MODE[h.mode]}</div></div>
+   <div class="bd" style="display:grid;gap:12px"><h3>المسارات</h3>${trs.map(x=>`<div>${trackTag(x.id)}<div class="muted" style="font-size:.85rem">${esc(x.descAr||'')}</div></div>`).join('')}<h3>شروط المشاركة</h3><p class="muted" style="margin:0">${esc(h.eligibility||'—')}</p><h3>التسجيل</h3><p class="muted num" style="margin:0">${fmtDT(h.regStart)} → ${fmtDT(h.regEnd)}</p></div></div>
+  <div class="note">المعاينة تعرض البيانات المحفوظة. النشر للموقع العام يحتاج ربطًا لم يُنفذ.</div></div>`}
+function modalHtml(){const m=UI.modal;if(!m)return '';return `<div class="scrim" data-a="mclose"></div><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div class="box"><div class="bd"><h2 id="mt">${esc(m.title)}</h2>${m.body||''}${m.reason?`<label class="field"><span>${esc(m.reason)}</span><textarea id="mReason"></textarea></label>`:''}${m.extra||''}</div><div class="ft">${btn(m.cancel||'إلغاء','mclose',{})}${m.ok?btn(m.ok,'mok',{},m.danger?'danger':'pri'):''}</div></div></div>`}
+function renderToasts(){let el=document.getElementById('toasts');if(!el)return;el.innerHTML=UI.toasts.map(t_=>`<div class="toast ${t_.bad?'bad':''}" role="status">${esc(t_.msg)}</div>`).join('')}
+function authPage(){const setup=UI.authView==='setup';
+  return `<div class="denied" style="min-height:100%"><div class="card" style="width:min(420px,100%);text-align:start"><div class="bd form">
+   <div class="brand"><span class="mark" aria-hidden="true"></span><span>إدارة الهاكاثونات</span></div>
+   <h1>${setup?'الإعداد الأول':'تسجيل الدخول'}</h1>${setup?'<p class="muted" style="margin:0">ينشئ حساب مدير النظام الأول أو يعيد تعيين كلمة مروره. يتطلب مفتاح الإعداد المحفوظ في الخادم.</p>':''}
+   <form class="form" data-form="${setup?'setup':'login'}">
+    ${setup?'<label class="field"><span>مفتاح الإعداد</span><input id="su-key" name="key" type="password" required></label><label class="field"><span>الاسم</span><input id="su-name" name="name" required></label>':''}
+    <label class="field"><span>البريد الإلكتروني</span><input id="li-email" name="email" type="email" dir="ltr" autocomplete="username" required></label>
+    <label class="field"><span>كلمة المرور${setup?' (10 أحرف على الأقل)':''}</span><input id="li-pw" name="password" type="password" autocomplete="${setup?'new-password':'current-password'}" required></label>
+    <div class="err" id="authErr" role="alert"></div>
+    <button class="btn pri" type="submit">${setup?'حفظ وإنشاء الحساب':'دخول'}</button></form>
+   <button class="lnk" data-a="authview" data-k="${setup?'login':'setup'}">${setup?'رجوع لتسجيل الدخول':'الإعداد الأول للمنصة'}</button></div></div></div>${busyHtml()}<div class="toasts" id="toasts"></div>`}
+const busyHtml=()=>`<div id="busy" class="toast" style="position:fixed;top:calc(12px + env(safe-area-inset-top,0px));inset-inline-start:50%;transform:translateX(50%);z-index:95" ${UI.busy?'':'hidden'}>جارٍ الاتصال بالخادم…</div>`;
+function render(){const app=document.getElementById('app');if(!app)return;
+  if(!UI.token){app.innerHTML=authPage();renderToasts();return}
+  if(!DB||!me()){app.innerHTML=`<div class="denied"><div class="empty"><b>جارٍ تحميل البيانات من Airtable…</b></div></div>${busyHtml()}<div class="toasts" id="toasts"></div>`;renderToasts();return}
+  const u=me();
+  const hs=visibleHackathons();if(!UI.hid||!hs.some(h=>h.id===UI.hid)&&!UI.forceH)UI.hid=(hs.find(h=>h.status!=='archived')||hs[0])?.id||null;
+  if(me().role==='judge'&&!['myreviews','about'].includes(UI.page))UI.page='myreviews';
+  document.documentElement.setAttribute('dir',UI.lang==='ar'?'rtl':'ltr');document.documentElement.setAttribute('lang',UI.lang);
+  const fn=PAGES[UI.page]||(UI.page.startsWith('later_')?()=>pg_later({later_agenda:'الأجندة',later_partners:'الجهات والشركاء',later_faq:'الأسئلة الشائعة',later_mentor:'الإرشاد',later_cert:'الشهادات',later_files:'الملفات والتقارير'}[UI.page]):pg_dash);
+  let body;try{body=fn()}catch(e){body=denied(e.message)}
+  app.innerHTML=topbar()+`<div class="shell">${sidebar()}<main id="main" tabindex="-1">${body}</main></div>${drawerHtml()}${modalHtml()}${busyHtml()}<div class="toasts" id="toasts"></div>`;
+  renderToasts();UI.forceH=false;
+  if(UI.focus){const el=document.getElementById(UI.focus);if(el){el.focus();if(el.setSelectionRange){const n=el.value.length;try{el.setSelectionRange(n,n)}catch(_){}}}UI.focus=null}
+  const ts=document.getElementById('trSum');if(ts)updTrSum();
+}
+function updTrSum(){const els=[...document.querySelectorAll('#trW input[type=number]')];const s=sum(els.map(e=>e.value));const el=document.getElementById('trSum');if(el){el.textContent=s+'%';el.className='sum '+(s===100?'ok':'bad')}}
+function updCSum(){const rows=[...document.querySelectorAll('[data-crow]')];const s=sum(rows.filter(r=>r.querySelector('[name=en]').checked).map(r=>r.querySelector('[name=w]').value));const el=document.getElementById('cSum');if(el){el.textContent=s+'%';el.className='sum '+(s===100?'ok':'bad')}}
+
+/* =========================================================
+   Events
+   ========================================================= */
+const F=form=>{const fd=new FormData(form);const o={};for(const [k,v] of fd.entries()){if(o[k]!==undefined){o[k]=[].concat(o[k],v)}else o[k]=v}return o};
+function formErr(id,e){const el=document.getElementById(id);if(el){el.textContent=e.message}toast(e.message,true)}
+async function tryForm(errId,fn,ok){try{await fn();if(ok)toast(ok);render();return true}catch(e){formErr(errId,e);return false}}
+const SUBMIT={
+  hsubmit:()=>{const f=document.querySelector('[data-form=hsave]');const o=F(f);const id=f.dataset.id;
+    const d={nameAr:o.nameAr,nameEn:o.nameEn,edition:o.edition,color:o.color,descAr:o.descAr,descEn:o.descEn,logo:o.logo||'',mode:o.mode,tz:o.tz,regStart:o.regStart,regEnd:o.regEnd,eventStart:o.eventStart,eventEnd:o.eventEnd,
+      teamMin:+o.teamMin,teamMax:+o.teamMax,maxTeams:+o.maxTeams,allowIndividual:!!o.allowIndividual,allowTeam:!!o.allowTeam,formationDeadline:o.formationDeadline,confirmDeadline:o.confirmDeadline,eligibility:o.eligibility,policies:o.policies,
+      submissionDeadline:o.submissionDeadline,maxFileKB:+o.maxFileKB,extensions:o.extensions,scoreMin:+o.scoreMin,scoreMax:+o.scoreMax,incompletePolicy:o.incompletePolicy,tieRule:o.tieRule};
+    const tie=[...document.querySelectorAll('[data-tie]')];if(tie.length)d.tieOrder=tie.filter(x=>x.checked).map(x=>x.dataset.tie);
+    if(id)tryForm('hErr',()=>api.updateHackathon(id,d),'حُفظت الإعدادات. المحتوى العام لم يتغير حتى تنشر.');
+    else tryForm('hErr',async()=>{const r=await api.createHackathon(d);UI.hid=r.id;UI.page='settings'},'أُنشئ الهاكاثون كمسودة. أضف المسارات والمعايير.')},
+  appsubmit:()=>{const f=document.querySelector('[data-form=appsave]');const o=F(f);tryForm(null,async()=>{await api.updateApp(f.dataset.id,o,f.dataset.v);if(UI.drawer)UI.drawer.edit=false},'حُفظت بيانات الطلب.')},
+  notesubmit:()=>{const f=document.querySelector('[data-form=note]');tryForm(null,()=>api.addNote(f.dataset.id,F(f).text),'أُضيفت الملاحظة.')},
+  newappsubmit:()=>{const f=document.querySelector('[data-form=newapp]');tryForm('naErr',async()=>{const a=await api.createApp(UI.hid,F(f));UI.drawer={type:'app',id:a.id}},'أُضيف الطلب.')},
+  teamsubmit:()=>{const f=document.querySelector('[data-form=teamsave]');const o=F(f);tryForm(null,async()=>{await api.saveTeam(UI.hid,{...o,id:f.dataset.id||undefined,challengeId:o.challengeId||null});UI.drawer=null},'حُفظ الفريق.')},
+  projsubmit:()=>{const f=document.querySelector('[data-form=projsave]');const o=F(f);tryForm(null,async()=>{const p=await api.saveProject(UI.hid,{...o,id:f.dataset.id||undefined});UI.drawer={type:'proj',id:p.id}},'حُفظ المشروع.')},
+  followsubmit:()=>{const f=document.querySelector('[data-form=follow]');tryForm(null,()=>api.saveFollow(f.dataset.id,F(f)),'حُفظت بيانات المتابعة.')},
+  tracksubmit:()=>{const f=document.querySelector('[data-form=tracksave]');const o=F(f);const h=H(UI.hid);
+    const weights=o.own?Object.fromEntries(h.criteria.filter(c=>c.enabled).map(c=>[c.code,+o['w_'+c.code]||0])):null;
+    const d={id:f.dataset.id||undefined,nameAr:o.nameAr,nameEn:o.nameEn,descAr:o.descAr,color:o.color,icon:o.icon,winners:+o.winners,prizes:String(o.prizes||'').split('\n').map(s=>s.trim()).filter(Boolean),weights};
+    if(!d.id)delete d.id;tryForm('trErr',async()=>{await api.saveTrack(UI.hid,d,String(o.challenges||'').split('\n'));UI.drawer=null},'حُفظ المسار.')},
+  csubmit:()=>{const rows=[...document.querySelectorAll('[data-crow]')];const list=rows.map(r=>({id:r.querySelector('[name=cid]').value,isNew:!r.querySelector('[name=cid]').value,code:r.querySelector('[name=code]').value,nameAr:r.querySelector('[name=cname]').value,weight:+r.querySelector('[name=w]').value||0,enabled:r.querySelector('[name=en]').checked}));
+    tryForm('cErr',()=>api.saveCriteria(UI.hid,list),'حُفظت المعايير.')},
+  sessubmit:()=>{const f=document.querySelector('[data-form=sessave]');const fd=new FormData(f);const d={id:f.dataset.id||undefined,title:fd.get('title'),start:fd.get('start'),duration:+fd.get('duration'),room:fd.get('room'),link:fd.get('link'),judgeIds:fd.getAll('judgeIds'),projectIds:fd.getAll('projectIds')};
+    if(!d.id)delete d.id;tryForm('seErr',async()=>{await api.saveSession(UI.hid,d);UI.drawer=null},'حُفظت الجلسة.')},
+  evaldraft:()=>evalSave(false),evalsubmit:()=>{confirmBox({title:'تسليم التقييم نهائيًا؟',body:'<p>بعد التسليم لا يمكنك تعديل الدرجات. إعادة الفتح تتم من مسؤول التحكيم.</p>',ok:'تسليم نهائي',fn:()=>evalSave(true,true)})},
+  coiselfsubmit:()=>{const f=document.querySelector('[data-form=coiself]');tryForm(null,()=>api.declareCOI(f.dataset.id,UI.user,F(f).reason),'أُرسل الإفصاح لمسؤول التحكيم.')},
+  usersubmit:()=>{const f=document.querySelector('[data-form=usersave]');const fd=new FormData(f);const d={id:f.dataset.id||undefined,name:fd.get('name'),nameEn:fd.get('nameEn'),email:fd.get('email'),role:fd.get('role'),specialty:fd.get('specialty'),scope:fd.get('all')?'all':fd.getAll('scope')};
+    const pw=fd.get('password')||'';if(!d.id)delete d.id;
+    if(!d.id&&pw.length<10){formErr('usErr',new Error('اكتب كلمة مرور من 10 أحرف على الأقل للحساب الجديد.'));return}
+    if(d.id&&pw&&pw.length<10){formErr('usErr',new Error('كلمة المرور يجب أن تكون 10 أحرف على الأقل.'));return}
+    tryForm('usErr',async()=>{const r=await api.saveUser(d);const id=d.id||(r&&r.id);if(pw&&id)await api.setPassword(id,pw);UI.drawer=null},'حُفظ المستخدم.')}
+};
+async function evalSave(submit,fromModal){const f=document.querySelector('[data-form=evalsave]');if(!f)return;const p=PR(f.dataset.id);const fd=new FormData(f);const scores={};critOf(p.trackId).forEach(c=>{scores[c.code]=fd.get('s_'+c.code)});
+  try{await api.saveEval(p.id,scores,fd.get('comment'),submit);toast(submit?'سُلّم التقييم نهائيًا.':'حُفظت المسودة.');if(fromModal)UI.modal=null;render()}catch(e){if(fromModal)UI.modal=null;render();toast(e.message,true)}}
+function reasonModal(title,label,fn,o={}){confirmBox({title,reason:label,ok:o.ok||'تأكيد',danger:o.danger,body:o.body||'',fn:()=>{const r=document.getElementById('mReason')?.value||'';return fn(r)}})}
+const ACT={
+  go:d=>go(d.p),gohk:d=>{UI.hid=d.h;go(d.p)},gotab:d=>{UI.tab[d.g]=d.k;go(d.p)},navt:()=>{UI.nav=!UI.nav;render()},
+  lang:()=>{UI.lang=UI.lang==='ar'?'en':'ar';render()},
+  close:()=>{UI.drawer=null;render()},mclose:()=>{UI.modal=null;render()},
+  mok:async()=>{const m=UI.modal;let keep=false;try{const r=m.fn&&await m.fn();keep=r===false}catch(e){toast(e.message,true);return}if(!keep&&UI.modal===m){UI.modal=null;render()}else if(!keep)render()},
+  tab:d=>{UI.tab[d.g]=d.k;render()},
+  tsort:d=>{const st=UI.tables[d.t];if(st.sort===d.k)st.dir*=-1;else{st.sort=d.k;st.dir=1}render()},tpage:d=>{UI.tables[d.t].page=+d.k;render()},tclear:d=>{UI.sel[d.t].clear();render()},
+  export:d=>{const h=H(UI.hid);const K={
+    apps:['المشاركون والطلبات',[['الاسم بالعربية',a=>a.name],['الاسم بالإنجليزية',a=>a.nameEn],['البريد',a=>a.email],['الجهة',a=>a.org],['نوع الجهة',a=>a.orgType],['التخصص',a=>a.specialty],['المسار المفضل',a=>T(a.trackId)?.nameAr],['الأهلية',a=>ELIG[a.eligibility][0]],['القرار',a=>DEC[a.decision][0]],['الفريق',a=>TM(a.teamId)?.name],['تاريخ التسجيل',a=>fmtDT(a.createdAt)]],()=>appsOf(h.id),'application'],
+    teams:['الفرق',[['الفريق',x=>x.name],['المسار',x=>T(x.trackId)?.nameAr],['الأعضاء',x=>membersOf(x.id).map(a=>a.name).join(' | ')],['القائد',x=>A(x.leaderId)?.name],['مكتمل',x=>teamCheck(x).ok?'نعم':'لا'],['النواقص',x=>teamCheck(x).miss.join(' | ')]],()=>teamsOf(h.id),'team'],
+    projects:['المشاريع',[['الرقم المرجعي',p=>p.id.toUpperCase()],['الفكرة',p=>p.title],['الفريق',p=>TM(p.teamId)?.name],['المسار',p=>T(p.trackId)?.nameAr],['الحالة',p=>PROJ[p.status][0]],['النسخ',p=>p.submissions.length],['المتابعة',p=>FOLLOW[p.follow.status][0]]],()=>projectsOf(h.id),'project'],
+    results:['النتائج',[['المسار',x=>T(x.trackId)?.nameAr],['الترتيب',x=>x.excluded?'مستبعد':x.rank],['الجائزة',x=>x.prize],['المشروع',x=>PR(x.projectId)?.title],['الفريق',x=>TM(x.teamId)?.name],['النتيجة',x=>r1(x.score)],['التقييمات',x=>`${x.done}/${x.required}`],['الحالة',()=>RST[h.results.state][0]]],()=>h.results.rows,'results'],
+    audit:['سجل الأنشطة',[['التوقيت',l=>fmtDT(l.at)],['المنفذ',l=>uname(l.userId)],['الهاكاثون',l=>H(l.hid)?.nameAr||'الشركة'],['الإجراء',l=>l.action],['التفاصيل',l=>l.detail]],()=>DB.audit.filter(l=>!l.hid||inScope(me(),l.hid)),'audit']}[d.k];
+    exportBox(K[0],K[1].map(([label,fn])=>({label,text:fn})),K[2](),K[3])},
+  harch:d=>confirmBox({title:'أرشفة الهاكاثون؟',body:'<p>يصبح للقراءة فقط ويختفي من لوحة التحكم العامة. يمكن استعادته لاحقًا.</p>',ok:'أرشفة',danger:1,fn:async()=>{await api.setHStatus(d.id,'archived');toast('أُرشف الهاكاثون.')}}),
+  hunarch:d=>run(()=>api.setHStatus(d.id,'draft'),'استُعيد الهاكاثون كمسودة.'),
+  hpublish:d=>confirmBox({title:'نشر الهاكاثون؟',body:'<p>يصبح المحتوى العام (الوصف، المسارات، الشروط، مواعيد التسجيل) جاهزًا للنشر. الربط الفعلي مع الموقع العام لم يُنفذ.</p>',ok:'نشر',fn:async()=>{await api.setHStatus(d.id,'published');toast('نُشر الهاكاثون.')}}),
+  hunpublish:d=>run(()=>api.setHStatus(d.id,'draft'),'أُعيد الهاكاثون إلى مسودة.'),
+  hpreview:d=>{UI.drawer={type:'preview',id:d.id};render()},hsubmit:()=>SUBMIT.hsubmit(),
+  tieup:d=>{const h=H(UI.hid);const boxes=[...document.querySelectorAll('[data-tie]')];const order=boxes.map(b=>b.dataset.tie);const on=new Set(boxes.filter(b=>b.checked).map(b=>b.dataset.tie));const i=order.indexOf(d.k);if(i>0){[order[i-1],order[i]]=[order[i],order[i-1]]}
+    document.getElementById('tieList').innerHTML=tieListHtml(h,order,on)},
+  tedit:d=>{UI.drawer={type:'track',id:d.id};render()},tmove:d=>run(()=>api.moveTrack(d.id,+d.d)),
+  tdel:d=>confirmBox({title:'حذف المسار؟',body:`<p>سيُحذف «${esc(T(d.id).nameAr)}» وتحدياته وإسنادات محكميه. يُمنع الحذف إذا ارتبط بفرق أو مشاريع.</p>`,ok:'حذف',danger:1,fn:async()=>{await api.deleteTrack(d.id);toast('حُذف المسار.')}}),
+  tracksubmit:()=>SUBMIT.tracksubmit(),
+  cadd:()=>{const tb=document.getElementById('cRows');tb.insertAdjacentHTML('beforeend',critRow({code:'',nameAr:'',weight:0,enabled:true},0,H(UI.hid)));updCSum()},
+  crem:(d,el)=>{el.closest('tr').remove();updCSum()},csubmit:()=>SUBMIT.csubmit(),
+  openapp:d=>{UI.drawer={type:'app',id:d.id};render()},newapp:()=>{UI.drawer={type:'newapp'};render()},newappsubmit:()=>SUBMIT.newappsubmit(),
+  appedit:d=>{UI.drawer.edit=!!d.on;render()},appsubmit:()=>SUBMIT.appsubmit(),notesubmit:()=>SUBMIT.notesubmit(),
+  elig:d=>{const r=document.getElementById('decReason')?.value||'';run(()=>api.setElig(d.id,d.to,r),'تم تحديث الأهلية.')},
+  dec:d=>{const r=document.getElementById('decReason')?.value||'';if(d.to==='rejected'||d.to==='withdrawn'){confirmBox({title:`${DEC_VERB[d.to]} الطلب؟`,body:`<p>${d.to==='withdrawn'&&A(d.id).teamId?'سيُزال المشارك من فريقه. ':''}السبب المكتوب: ${esc(r||'— لم يُكتب سبب —')}</p>`,ok:DEC_VERB[d.to],danger:1,fn:async()=>{await api.setDecision(d.id,d.to,r);toast('حُدّث القرار.')}})}else run(()=>api.setDecision(d.id,d.to,r),'حُدّث القرار.')},
+  assignsel:d=>{const v=document.getElementById('asgTeam').value;if(!v)return toast('اختر فريقًا.',true);run(()=>api.assign(d.id,v),'تم الإسناد.')},
+  unassign:d=>confirmBox({title:'إزالة المشارك من الفريق؟',body:`<p>${esc(A(d.id).name)} سيعود إلى قائمة «بدون فريق».</p>`,ok:'إزالة',danger:1,fn:async()=>{await api.unassign(d.id);toast('أُزيل من الفريق.')}}),
+  leader:d=>run(()=>api.setLeader(d.t,d.id),'حُدّد القائد.'),
+  bulk:d=>{const ids=[...UI.sel.apps];const [kind,to]=[d.op.split('_')[0],d.op.split('_').slice(1).join('_')];const needR=(kind==='elig'&&to!=='eligible')||(kind==='dec'&&['rejected'].includes(to));
+    const label=kind==='elig'?`الأهلية: ${ELIG[to][0]}`:`القرار: ${DEC[to][0]}`;
+    confirmBox({title:`إجراء جماعي — ${label}`,body:`<p>سيُطبَّق على <b class="num">${ids.length}</b> طلب. السجلات التي لا يسمح انتقالها ستظهر مع السبب.</p>`,reason:needR?'السبب (مطلوب)':'ملاحظة (اختيارية)',ok:'تنفيذ',
+      fn:async()=>{const r=document.getElementById('mReason')?.value||'';const res=await api.bulkApps(ids,kind,to,r);UI.sel.apps.clear();
+        setTimeout(()=>confirmBox({title:'نتيجة الإجراء الجماعي',body:`<p>نجح: <b class="num">${res.ok.length}</b> · تعذر: <b class="num">${res.failed.length}</b></p>${res.failed.length?`<div class="list">${res.failed.map(f=>`<div><span>${esc(f.name)}</span><small class="muted" style="max-width:60%">${esc(f.msg)}</small></div>`).join('')}</div>`:''}`,cancel:'إغلاق'}),0)}})},
+  teamedit:d=>{UI.drawer={type:'team',id:d.id};render()},teamsubmit:()=>SUBMIT.teamsubmit(),
+  teamdel:d=>confirmBox({title:'حذف الفريق؟',body:`<p>سيعود أعضاء «${esc(TM(d.id).name)}» إلى قائمة «بدون فريق».</p>`,ok:'حذف',danger:1,fn:async()=>{await api.deleteTeam(d.id);toast('حُذف الفريق.')}}),
+  openproj:d=>{UI.drawer={type:'proj',id:d.id};render()},projedit:d=>{UI.drawer=d.id?{type:'proj',id:d.id,edit:true}:{type:'projnew'};render()},projcancel:d=>{UI.drawer={type:'proj',id:d.id};render()},projsubmit:()=>SUBMIT.projsubmit(),
+  pstatus:d=>{const n=document.getElementById('projNote')?.value||'';run(()=>api.setProjStatus(d.id,d.to,n),'حُدّثت حالة المشروع.')},
+  subadd:d=>reasonModal('تسجيل نسخة تسليم','وصف النسخة (اختياري)',async r=>{await api.addSubmission(d.id,r);toast('سُجّلت النسخة.')},{body:'<p class="muted">رفع الملفات الفعلي غير منفذ في النموذج الأولي؛ تُسجل النسخة ووقتها فقط.</p>'}),
+  followsubmit:()=>SUBMIT.followsubmit(),
+  sesedit:d=>{UI.drawer={type:'session',id:d.id};render()},sessubmit:()=>SUBMIT.sessubmit(),
+  sesdel:d=>confirmBox({title:'حذف الجلسة؟',ok:'حذف',danger:1,fn:async()=>{await api.deleteSession(d.id);toast('حُذفت الجلسة.')}}),
+  coinew:()=>{const h=H(UI.hid);confirmBox({title:'تسجيل إفصاح عن تعارض مصالح',reason:'طبيعة التعارض',ok:'تسجيل',
+    extra:`<div class="fgrid"><label class="field"><span>المحكم</span><select id="coiJ">${DB.users.filter(u=>u.role==='judge'&&inScope(u,h.id)).map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></label><label class="field"><span>المشروع</span><select id="coiP">${projectsOf(h.id).map(p=>`<option value="${p.id}">${esc(p.title)}</option>`).join('')}</select></label></div>`,
+    fn:async()=>{await api.declareCOI(document.getElementById('coiP').value,document.getElementById('coiJ').value,document.getElementById('mReason').value);toast('سُجّل الإفصاح.')}})},
+  coiok:d=>confirmBox({title:'اعتماد استبعاد المحكم؟',body:'<p>لن يرى المحكم المشروع، ولن يُحتسب ضمن التقييمات المطلوبة له، وتُحذف مسودته إن وُجدت.</p>',ok:'اعتماد الاستبعاد',fn:async()=>{await api.resolveCOI(d.id,'approved');toast('اعتُمد الاستبعاد.')}}),
+  coino:d=>run(()=>api.resolveCOI(d.id,'rejected'),'رُفض طلب الاستبعاد.'),
+  reopen:d=>reasonModal('إعادة فتح تقييم','سبب إعادة الفتح (يُوثّق)',async r=>{await api.reopenEval(d.id,r);toast('أُعيد فتح التقييم.')}),
+  openeval:d=>{UI.drawer={type:'eval',id:d.id};render()},evaldraft:()=>SUBMIT.evaldraft(),evalsubmit:()=>SUBMIT.evalsubmit(),coiselfsubmit:()=>SUBMIT.coiselfsubmit(),
+  calc:()=>run(()=>api.calcResults(UI.hid),'احتُسبت النتائج. راجعها قبل الاعتماد.'),
+  approve:()=>confirmBox({title:'اعتماد النتائج؟',body:'<p>يُثبّت الترتيب الحالي. أي تغيير لاحق في التقييمات يسحب الاعتماد تلقائيًا.</p>',ok:'اعتماد',fn:async()=>{await api.approveResults(UI.hid);toast('اعتُمدت النتائج.')}}),
+  publish:()=>confirmBox({title:'نشر النتائج؟',body:'<p>تُنشر: المسار، المركز، اسم الفريق، عنوان المشروع فقط.</p>',ok:'نشر',fn:async()=>{await api.publishResults(UI.hid);toast('نُشرت النتائج داخل المنصة.')}}),
+  unpublish:()=>run(()=>api.unpublishResults(UI.hid),'أُوقف النشر.'),
+  adj:d=>confirmBox({title:`تعديل ترتيب: ${PR(d.id).title}`,reason:'سبب التعديل الإداري (يُوثّق)',ok:'حفظ التعديل',extra:`<label class="field"><span>المركز الجديد</span><input id="adjRank" type="number" min="1" value="1"></label>`,
+    fn:async()=>{await api.adjustRank(UI.hid,d.id,document.getElementById('adjRank').value,document.getElementById('mReason').value);toast('سُجّل التعديل. أعد الاعتماد.')}}),
+  uedit:d=>{UI.drawer={type:'user',id:d.id,role:d.role};render()},usersubmit:()=>SUBMIT.usersubmit(),
+  uactive:d=>run(async()=>{await api.setActive(d.id,!!d.on);UI.drawer=null},'حُدّث الحساب.'),
+  refresh:()=>run(()=>call('load'),'حُدّثت البيانات.'),
+  logout:()=>{setToken(null);DB=null;UI.user=null;UI.hid=null;UI.page='dash';UI.drawer=null;UI.modal=null;render()},
+  mypw:()=>confirmBox({title:'تغيير كلمة المرور',body:'<p class="muted">10 أحرف على الأقل.</p>',extra:'<label class="field"><span>كلمة المرور الجديدة</span><input id="newPw" type="password" autocomplete="new-password"></label>',ok:'حفظ',
+    fn:async()=>{await api.setPassword(UI.user,document.getElementById('newPw').value);toast('تم تغيير كلمة المرور.')}}),
+  authview:d=>{UI.authView=d.k;render()}
+};
+if(typeof document!=='undefined'){
+  document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el)return;if(el.tagName==='SUMMARY')return;const fn=ACT[el.dataset.a];if(!fn)return;e.preventDefault();
+    if(el.closest('details.pop'))el.closest('details.pop').open=false;fn(el.dataset,el,e)});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(UI.modal){UI.modal=null;render()}else if(UI.drawer){UI.drawer=null;render()}}
+    if((e.key==='Enter'||e.key===' ')&&e.target.matches('tr.click')){e.preventDefault();e.target.click()}});
+  document.addEventListener('submit',async e=>{e.preventDefault();const f=e.target;if(f.dataset.form==='gsearch'){UI.q=new FormData(f).get('q')||'';go('search');return}
+    if(f.dataset.form==='login'||f.dataset.form==='setup'){const fd=new FormData(f);const err=document.getElementById('authErr');err.textContent='';
+      try{if(f.dataset.form==='setup'){await call('setup',[fd.get('key'),fd.get('name'),fd.get('email'),fd.get('password')]);toast('تم إنشاء الحساب. سجّل الدخول الآن.');UI.authView='login';render();return}
+        const r=await call('login',[fd.get('email'),fd.get('password')]);setToken(r.token);UI.page='dash';await loadData()}catch(x){const el=document.getElementById('authErr');if(el)el.textContent=x.message;else toast(x.message,true)}return}
+    const map={hsave:'hsubmit',appsave:'appsubmit',note:'notesubmit',newapp:'newappsubmit',teamsave:'teamsubmit',projsave:'projsubmit',follow:'followsubmit',tracksave:'tracksubmit',csave:'csubmit',sessave:'sessubmit',coiself:'coiselfsubmit',usersave:'usersubmit',evalsave:'evaldraft'};
+    const k=map[f.dataset.form];if(k&&SUBMIT[k])SUBMIT[k]()});
+  document.addEventListener('input',e=>{const el=e.target;const k=el.dataset.in;if(k==='tq'){const st=UI.tables[el.dataset.t];st.q=el.value;st.page=1;UI.focus=el.id;render()}if(k==='csum')updCSum();if(k==='trsum')updTrSum()});
+  document.addEventListener('change',e=>{const el=e.target;const k=el.dataset.ch;if(!k)return;const st=UI.tables[el.dataset.t];
+    if(k==='hk'){UI.hid=el.value;UI.drawer=null;if(['dash','hackathons','users','audit','about','hnew'].includes(UI.page))UI.page='overview';render();toast('الهاكاثون النشط: '+H(el.value).nameAr)}
+    else if(k==='tf'){st.f[el.dataset.k]=el.value;st.page=1;render()}else if(k==='tsize'){st.size=+el.value;st.page=1;render()}
+    else if(k==='tcol'){st.hidden=el.checked?st.hidden.filter(x=>x!==el.dataset.k):[...st.hidden,el.dataset.k];render()}
+    else if(k==='tsel'){const s=UI.sel[el.dataset.t];el.checked?s.add(el.dataset.id):s.delete(el.dataset.id);render()}
+    else if(k==='tall'){const s=UI.sel[el.dataset.t];document.querySelectorAll(`[data-ch=tsel][data-t="${el.dataset.t}"]`).forEach(c=>el.checked?s.add(c.dataset.id):s.delete(c.dataset.id));render()}
+    else if(k==='quickassign'){if(el.value)run(()=>api.assign(el.dataset.id,el.value),'تم الإسناد.')}
+    else if(k==='jt')run(()=>api.setJudgeTrack(UI.hid,el.dataset.j,el.dataset.t,el.checked),el.checked?'أُسند المحكم.':'أُلغي الإسناد.')
+    else if(k==='teamtrack'){const sel=document.getElementById('te-ch');sel.innerHTML='<option value="">—</option>'+DB.challenges.filter(c=>c.trackId===el.value).map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('')}
+    else if(k==='trown'){document.getElementById('trW').hidden=!el.checked;updTrSum()}
+    else if(k==='csum')updCSum()
+    else if(k==='logo'){const f=el.files[0];if(!f)return;if(f.size>300*1024){toast('حجم الشعار أكبر من 300 كيلوبايت.',true);el.value='';return}const r=new FileReader();r.onload=()=>{document.getElementById('f-logoData').value=r.result;document.getElementById('logoPrev').innerHTML=`<img src="${r.result}" alt="الشعار" style="max-height:48px">`};r.readAsDataURL(f)}});
+  UI.token=getToken();render();
+  if(UI.token)loadData().catch(e=>{render();toast(e.message,true)});
+}
+</script>
+
+</body>
+</html>
