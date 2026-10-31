@@ -729,7 +729,7 @@ function hForm(h){const v=(k,d='')=>esc(h?h[k]??d:d);const isNew=!h;const crit=h
    <div class="field full"><span>ترتيب معايير كسر التعادل</span>${isNew||!crit.length?'<small>يُضبط بعد إضافة معايير التحكيم.</small>':`<div id="tieList" style="display:grid;gap:6px">${tieListHtml(h)}</div><small>يُقارن متوسط درجة المعيار الأول، ثم الثاني… وإن استمر التعادل يُطلب قرار يدوي موثّق.</small>`}</div>
   </div></fieldset>
   <div class="err" id="hErr" role="alert"></div>
-  <div class="acts">${btn(isNew?'إنشاء كمسودة':'حفظ التعديلات','hsubmit',{},'pri')}${!isNew?btn('معاينة المحتوى العام','hpreview',{id:h.id}):''}${!isNew&&h.status==='draft'&&can('hackathon','p',h.id)?btn('نشر','hpublish',{id:h.id}):''}${!isNew&&h.status==='published'&&can('hackathon','p',h.id)?btn('إرجاع لمسودة','hunpublish',{id:h.id}):''}</div></form>`}
+  <div class="acts">${btn(isNew?'إنشاء كمسودة':'حفظ التعديلات','hsubmit',{},'pri')}${!isNew?btn('معاينة المحتوى العام','hpreview',{id:h.id}):''}${!isNew?btn('فتح الصفحة العامة ↗','hpublic',{id:h.id}):''}${!isNew?btn('نسخ رابط الصفحة','hcopylink',{id:h.id}):''}${!isNew&&h.status==='draft'&&can('hackathon','p',h.id)?btn('نشر','hpublish',{id:h.id}):''}${!isNew&&h.status==='published'&&can('hackathon','p',h.id)?btn('إرجاع لمسودة','hunpublish',{id:h.id}):''}</div></form>`}
 function tieListHtml(h,order,on){const all=h.criteria.filter(c=>c.enabled);on=on||new Set(h.tieOrder||[]);
   order=order||[...(h.tieOrder||[]).filter(k=>all.some(c=>c.code===k)),...all.map(c=>c.code).filter(k=>!(h.tieOrder||[]).includes(k))];
   return order.map((k,i)=>{const c=all.find(x=>x.code===k);if(!c)return '';return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label class="chk"><input type="checkbox" data-tie="${k}" ${on.has(k)?'checked':''}> <span class="num">${i+1}.</span> ${esc(c.nameAr)} <span class="tag mono">${esc(k)}</span></label>${i>0?`<button type="button" class="btn sm" data-a="tieup" data-k="${k}" aria-label="رفع ${esc(c.nameAr)}">↑</button>`:''}</div>`}).join('')+'<div class="muted" style="font-size:.8rem">ثم: قرار يدوي موثّق. المعايير غير المحددة لا تُستخدم في كسر التعادل.</div>'}
@@ -1187,6 +1187,7 @@ const SUBMIT={
 async function evalSave(submit,fromModal){const f=document.querySelector('[data-form=evalsave]');if(!f)return;const p=PR(f.dataset.id);const fd=new FormData(f);const scores={};critOf(p.trackId).forEach(c=>{scores[c.code]=fd.get('s_'+c.code)});
   try{await api.saveEval(p.id,scores,fd.get('comment'),submit);toast(submit?'سُلّم التقييم نهائيًا.':'حُفظت المسودة.');if(fromModal)UI.modal=null;render()}catch(e){if(fromModal)UI.modal=null;render();toast(e.message,true)}}
 function reasonModal(title,label,fn,o={}){confirmBox({title,reason:label,ok:o.ok||'تأكيد',danger:o.danger,body:o.body||'',fn:()=>{const r=document.getElementById('mReason')?.value||'';return fn(r)}})}
+function publicHackathonUrl(id){const url=new URL('/register',API_URL);url.searchParams.set('event',id);return url.href}
 const ACT={
   go:d=>go(d.p),gohk:d=>{UI.hid=d.h;go(d.p)},gotab:d=>{UI.tab[d.g]=d.k;go(d.p)},navt:()=>{UI.nav=!UI.nav;render()},
   lang:()=>{UI.lang=UI.lang==='ar'?'en':'ar';render()},
@@ -1205,6 +1206,8 @@ const ACT={
   hunarch:d=>run(()=>api.setHStatus(d.id,'draft'),'استُعيد الهاكاثون كمسودة.'),
   hpublish:d=>confirmBox({title:'نشر الهاكاثون؟',body:'<p>يصبح المحتوى العام (الوصف، المسارات، الشروط، مواعيد التسجيل) جاهزًا للنشر. الربط الفعلي مع الموقع العام لم يُنفذ.</p>',ok:'نشر',fn:async()=>{await api.setHStatus(d.id,'published');toast('نُشر الهاكاثون.')}}),
   hunpublish:d=>run(()=>api.setHStatus(d.id,'draft'),'أُعيد الهاكاثون إلى مسودة.'),
+  hpublic:d=>{window.open(publicHackathonUrl(d.id),'_blank','noopener,noreferrer')},
+  hcopylink:async d=>{const link=publicHackathonUrl(d.id);try{if(!navigator.clipboard?.writeText)throw Error('clipboard');await navigator.clipboard.writeText(link);toast('تم نسخ رابط صفحة الهاكاثون.')}catch(e){confirmBox({title:'رابط الصفحة العامة',body:`<p>انسخي الرابط التالي:</p><input id="publicLinkCopy" readonly dir="ltr" style="width:100%" value="${esc(link)}">`,ok:'تحديد الرابط',fn:()=>{document.getElementById('publicLinkCopy')?.select();return false}})}},
   hpreview:d=>{UI.drawer={type:'preview',id:d.id};render()},hsubmit:()=>SUBMIT.hsubmit(),
   tieup:d=>{const h=H(UI.hid);const boxes=[...document.querySelectorAll('[data-tie]')];const order=boxes.map(b=>b.dataset.tie);const on=new Set(boxes.filter(b=>b.checked).map(b=>b.dataset.tie));const i=order.indexOf(d.k);if(i>0){[order[i-1],order[i]]=[order[i],order[i-1]]}
     document.getElementById('tieList').innerHTML=tieListHtml(h,order,on)},
@@ -1283,5 +1286,7 @@ if(typeof document!=='undefined'){
 }
 </script>
 
+<a href="https://hackathon-admin-api.innovationraces.workers.dev/register" target="_blank" rel="noopener" style="position:fixed;bottom:18px;left:18px;z-index:10000;background:#087d70;color:white;padding:12px 18px;border-radius:10px;text-decoration:none;font-family:Tahoma,Arial">صفحات الهاكاثونات والتسجيل ↗</a>
 </body>
 </html>
+
